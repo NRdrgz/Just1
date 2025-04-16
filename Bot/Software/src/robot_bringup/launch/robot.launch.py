@@ -35,9 +35,9 @@ def generate_launch_description():
     ld.add_action(manual_controller_node)
 
     state_publisher_node = Node(
-        package="robot_state_publisher",
+        package="robot_state_monitor",
         executable="state_publisher_node",
-        name="robot_state_publisher",
+        name="robot_state_monitor",
         output="screen",
         condition=IfCondition(LaunchConfiguration("mode").equals("manual")),
     )

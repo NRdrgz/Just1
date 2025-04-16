@@ -1,9 +1,9 @@
 import rclpy
 from rclpy.node import Node
-from robot_state_publisher.msg import WheelSpeeds
+from robot_state_monitor.msg import WheelSpeeds
 
 
-class RobotStatePublisher(Node):
+class RobotStateMonitor(Node):
     def __init__(self):
         super().__init__("robot_state_publisher")
 
@@ -12,7 +12,7 @@ class RobotStatePublisher(Node):
             WheelSpeeds, "wheel_speeds", self.wheel_speeds_callback, 10
         )
 
-        self.get_logger().info("Robot State Publisher initialized")
+        self.get_logger().info("Robot State Monitor initialized")
 
     def wheel_speeds_callback(self, msg):
         # Print wheel speeds
@@ -24,7 +24,7 @@ class RobotStatePublisher(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = RobotStatePublisher()
+    node = RobotStateMonitor()
 
     try:
         rclpy.spin(node)
