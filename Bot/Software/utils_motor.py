@@ -125,7 +125,10 @@ def control_wheel(wheel_name, direction, speed):
         raise ValueError("Speed must be between 0 and 100")
 
     wheel = wheel_map[wheel_name]
-    duty_cycle = int(speed * 1000000)  # Convert to 0-1000000 range for lgpio
+    # Convert speed (0-100) to duty cycle (0-1000000)
+    duty_cycle = int((speed / 100.0) * 1000000)
+    # Ensure duty cycle is within valid range
+    duty_cycle = max(0, min(1000000, duty_cycle))
 
     if direction == "forward":
         lgpio.gpio_write(h, wheel["in1"], 1)
