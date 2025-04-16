@@ -34,13 +34,22 @@ def setup():
     """Initialize motor objects"""
     global front_left_motor, front_right_motor, back_left_motor, back_right_motor
 
-    # Create motor objects
-    front_left_motor = Motor(forward=front_left_in1, backward=front_left_in2, pwm=True)
-    front_right_motor = Motor(
-        forward=front_right_in1, backward=front_right_in2, pwm=True
+    # Create motor objects with explicit PWM enable pins
+    front_left_motor = Motor(
+        forward=front_left_in1, backward=front_left_in2, enable=front_left_ena, pwm=True
     )
-    back_left_motor = Motor(forward=back_left_in1, backward=back_left_in2, pwm=True)
-    back_right_motor = Motor(forward=back_right_in1, backward=back_right_in2, pwm=True)
+    front_right_motor = Motor(
+        forward=front_right_in1,
+        backward=front_right_in2,
+        enable=front_right_ena,
+        pwm=True,
+    )
+    back_left_motor = Motor(
+        forward=back_left_in1, backward=back_left_in2, enable=back_left_ena, pwm=True
+    )
+    back_right_motor = Motor(
+        forward=back_right_in1, backward=back_right_in2, enable=back_right_ena, pwm=True
+    )
 
 
 def stop_all():
