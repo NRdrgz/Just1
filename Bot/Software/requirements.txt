@@ -1,3 +1,4 @@
 pygame==2.5.2
+gpiozero==2.0
 lgpio==0.2.2.0
 pytest==8.0.0
