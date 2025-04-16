@@ -5,7 +5,7 @@ from robot_state_monitor.msg import WheelSpeeds
 
 class RobotStateMonitor(Node):
     def __init__(self):
-        super().__init__("robot_state_publisher")
+        super().__init__("robot_state_monitor")
 
         # Create subscriber for wheel speeds
         self.subscription = self.create_subscription(
