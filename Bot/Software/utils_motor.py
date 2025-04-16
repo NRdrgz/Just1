@@ -19,14 +19,13 @@ back_right_ena = 18  # PWM
 
 PWM_FREQ = 1000  # 1000 Hz frequency
 
-# Global handles
+# Global handle
 h = None
-pwm_handles = {}
 
 
 def setup():
     """Initialize GPIO pins and PWM channels"""
-    global h, pwm_handles
+    global h
 
     # Open GPIO chip
     h = lgpio.gpiochip_open(0)
@@ -50,13 +49,9 @@ def setup():
     for pin in pins:
         lgpio.gpio_claim_output(h, pin)
 
-    # Setup PWM pins
-    pwm_handles = {
-        "front_left": lgpio.tx_pwm(h, front_left_ena, PWM_FREQ, 0),
-        "front_right": lgpio.tx_pwm(h, front_right_ena, PWM_FREQ, 0),
-        "back_left": lgpio.tx_pwm(h, back_left_ena, PWM_FREQ, 0),
-        "back_right": lgpio.tx_pwm(h, back_right_ena, PWM_FREQ, 0),
-    }
+    # Initialize PWM on all ENA pins
+    for pwm_pin in [front_left_ena, front_right_ena, back_left_ena, back_right_ena]:
+        lgpio.tx_pwm(h, pwm_pin, PWM_FREQ, 0)
 
 
 def stop_all():
@@ -76,8 +71,8 @@ def stop_all():
         lgpio.gpio_write(h, pin, 0)
 
     # Set all PWM to 0
-    for handle in pwm_handles.values():
-        lgpio.tx_pwm(h, handle, PWM_FREQ, 0)
+    for pwm_pin in [front_left_ena, front_right_ena, back_left_ena, back_right_ena]:
+        lgpio.tx_pwm(h, pwm_pin, PWM_FREQ, 0)
 
 
 def control_wheel(wheel_name, direction, speed):
@@ -89,27 +84,27 @@ def control_wheel(wheel_name, direction, speed):
         direction (str): 'forward' or 'backward'
         speed (int): 0-100, representing percentage of max speed
     """
-    # Map wheel names to their corresponding pins and PWM handles
+    # Map wheel names to their corresponding pins
     wheel_map = {
         "front_left": {
             "in1": front_left_in1,
             "in2": front_left_in2,
-            "pwm": pwm_handles["front_left"],
+            "ena": front_left_ena,
         },
         "front_right": {
             "in1": front_right_in1,
             "in2": front_right_in2,
-            "pwm": pwm_handles["front_right"],
+            "ena": front_right_ena,
         },
         "back_left": {
             "in1": back_left_in1,
             "in2": back_left_in2,
-            "pwm": pwm_handles["back_left"],
+            "ena": back_left_ena,
         },
         "back_right": {
             "in1": back_right_in1,
             "in2": back_right_in2,
-            "pwm": pwm_handles["back_right"],
+            "ena": back_right_ena,
         },
     }
 
@@ -137,7 +132,7 @@ def control_wheel(wheel_name, direction, speed):
         lgpio.gpio_write(h, wheel["in1"], 0)
         lgpio.gpio_write(h, wheel["in2"], 1)
 
-    lgpio.tx_pwm(h, wheel["pwm"], PWM_FREQ, duty_cycle)
+    lgpio.tx_pwm(h, wheel["ena"], PWM_FREQ, duty_cycle)
 
 
 def test_wheel(wheel_name, duration=2):
