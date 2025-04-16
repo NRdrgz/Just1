@@ -7,10 +7,10 @@
   <maintainer email="nicolasrdrgzrosdev@protonmail.com">Nico</maintainer>
   <license>Apache License 2.0</license>
 
-
+  <buildtool_depend>ament_python</buildtool_depend>
   <depend>joystick_driver</depend>
   <depend>manual_motor_controller</depend>
-  <depend>robot_state_publisher</depend>
+  <depend>robot_state_monitor</depend>
   <depend>robot_utils</depend>
 
 

@@ -7,12 +7,11 @@
   <maintainer email="nicolasrdrgzrosdev@protonmail.com">Nico</maintainer>
   <license>Apache License 2.0</license>
 
-
+  <buildtool_depend>ament_python</buildtool_depend>
   <depend>rclpy</depend>
   <depend>sensor_msgs</depend>
   <depend>robot_utils</depend>
-  <depend>robot_state_publisher</depend>
-
+  <depend>robot_state_monitor</depend>
 
   <export>
     <build_type>ament_python</build_type>
