@@ -7,7 +7,7 @@
   <maintainer email="nicolasrdrgzrosdev@protonmail.com">Nico</maintainer>
   <license>Apache License 2.0</license>
 
-
+  <buildtool_depend>ament_python</buildtool_depend>
   <depend>rclpy</depend>
   <depend>sensor_msgs</depend>
 
