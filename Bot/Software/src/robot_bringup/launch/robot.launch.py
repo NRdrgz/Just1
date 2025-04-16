@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.conditions import IfCondition
 
 
@@ -30,7 +30,9 @@ def generate_launch_description():
         executable="controller_node",
         name="manual_motor_controller",
         output="screen",
-        condition=IfCondition(LaunchConfiguration("mode").equals("manual")),
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
     ld.add_action(manual_controller_node)
 
@@ -39,7 +41,9 @@ def generate_launch_description():
         executable="state_publisher_node",
         name="robot_state_monitor",
         output="screen",
-        condition=IfCondition(LaunchConfiguration("mode").equals("manual")),
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
     ld.add_action(state_publisher_node)
 
@@ -49,7 +53,9 @@ def generate_launch_description():
         executable="test_node",
         name="robot_tests",
         output="screen",
-        condition=IfCondition(LaunchConfiguration("mode").equals("test")),
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'test'"])
+        ),
     )
     ld.add_action(test_node)
 
