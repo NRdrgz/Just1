@@ -1,4 +1,4 @@
-from gpiozero import Motor, PWMOutputDevice
+import lgpio
 import time
 
 # Define GPIO pins for L298N #1 (Front Wheels)
@@ -17,32 +17,67 @@ back_right_in1 = 4
 back_right_in2 = 17
 back_right_ena = 18  # PWM
 
-# Global motor objects
-front_left_motor = None
-front_right_motor = None
-back_left_motor = None
-back_right_motor = None
+PWM_FREQ = 1000  # 1000 Hz frequency
+
+# Global handles
+h = None
+pwm_handles = {}
 
 
 def setup():
-    """Initialize motor objects"""
-    global front_left_motor, front_right_motor, back_left_motor, back_right_motor
+    """Initialize GPIO pins and PWM channels"""
+    global h, pwm_handles
 
-    # Create motor objects
-    front_left_motor = Motor(forward=front_left_in1, backward=front_left_in2, pwm=True)
-    front_right_motor = Motor(
-        forward=front_right_in1, backward=front_right_in2, pwm=True
-    )
-    back_left_motor = Motor(forward=back_left_in1, backward=back_left_in2, pwm=True)
-    back_right_motor = Motor(forward=back_right_in1, backward=back_right_in2, pwm=True)
+    # Open GPIO chip
+    h = lgpio.gpiochip_open(0)
+
+    # Setup all pins as outputs
+    pins = [
+        front_left_in1,
+        front_left_in2,
+        front_left_ena,
+        front_right_in1,
+        front_right_in2,
+        front_right_ena,
+        back_left_in1,
+        back_left_in2,
+        back_left_ena,
+        back_right_in1,
+        back_right_in2,
+        back_right_ena,
+    ]
+
+    for pin in pins:
+        lgpio.gpio_claim_output(h, pin)
+
+    # Setup PWM pins
+    pwm_handles = {
+        "front_left": lgpio.tx_pwm(h, front_left_ena, PWM_FREQ, 0),
+        "front_right": lgpio.tx_pwm(h, front_right_ena, PWM_FREQ, 0),
+        "back_left": lgpio.tx_pwm(h, back_left_ena, PWM_FREQ, 0),
+        "back_right": lgpio.tx_pwm(h, back_right_ena, PWM_FREQ, 0),
+    }
 
 
 def stop_all():
     """Stop all motors"""
-    front_left_motor.stop()
-    front_right_motor.stop()
-    back_left_motor.stop()
-    back_right_motor.stop()
+    # Stop all motors
+    pins = [
+        front_left_in1,
+        front_left_in2,
+        front_right_in1,
+        front_right_in2,
+        back_left_in1,
+        back_left_in2,
+        back_right_in1,
+        back_right_in2,
+    ]
+    for pin in pins:
+        lgpio.gpio_write(h, pin, 0)
+
+    # Set all PWM to 0
+    for handle in pwm_handles.values():
+        lgpio.tx_pwm(h, handle, PWM_FREQ, 0)
 
 
 def control_wheel(wheel_name, direction, speed):
@@ -54,12 +89,28 @@ def control_wheel(wheel_name, direction, speed):
         direction (str): 'forward' or 'backward'
         speed (int): 0-100, representing percentage of max speed
     """
-    # Map wheel names to their corresponding motor objects
+    # Map wheel names to their corresponding pins and PWM handles
     wheel_map = {
-        "front_left": front_left_motor,
-        "front_right": front_right_motor,
-        "back_left": back_left_motor,
-        "back_right": back_right_motor,
+        "front_left": {
+            "in1": front_left_in1,
+            "in2": front_left_in2,
+            "pwm": pwm_handles["front_left"],
+        },
+        "front_right": {
+            "in1": front_right_in1,
+            "in2": front_right_in2,
+            "pwm": pwm_handles["front_right"],
+        },
+        "back_left": {
+            "in1": back_left_in1,
+            "in2": back_left_in2,
+            "pwm": pwm_handles["back_left"],
+        },
+        "back_right": {
+            "in1": back_right_in1,
+            "in2": back_right_in2,
+            "pwm": pwm_handles["back_right"],
+        },
     }
 
     if wheel_name not in wheel_map:
@@ -73,13 +124,17 @@ def control_wheel(wheel_name, direction, speed):
     if not 0 <= speed <= 100:
         raise ValueError("Speed must be between 0 and 100")
 
-    motor = wheel_map[wheel_name]
-    speed = speed / 100.0  # Convert to 0-1 range
+    wheel = wheel_map[wheel_name]
+    duty_cycle = int(speed * 1000000)  # Convert to 0-1000000 range for lgpio
 
     if direction == "forward":
-        motor.forward(speed)
+        lgpio.gpio_write(h, wheel["in1"], 1)
+        lgpio.gpio_write(h, wheel["in2"], 0)
     else:  # backward
-        motor.backward(speed)
+        lgpio.gpio_write(h, wheel["in1"], 0)
+        lgpio.gpio_write(h, wheel["in2"], 1)
+
+    lgpio.tx_pwm(h, wheel["pwm"], PWM_FREQ, duty_cycle)
 
 
 def test_wheel(wheel_name, duration=2):
@@ -112,6 +167,7 @@ def test_wheel(wheel_name, duration=2):
 
 
 def cleanup():
-    """Clean up motor resources"""
+    """Clean up GPIO resources"""
     stop_all()
-    # gpiozero handles cleanup automatically
+    if h is not None:
+        lgpio.gpiochip_close(h)
