@@ -15,7 +15,7 @@ class ManualMotorController(Node):
         # Create subscriber for joystick input
         self.subscription = self.create_subscription(Joy, "joy", self.joy_callback, 10)
 
-        # Create publisher for wheel speeds
+        # Create publisher for wheel speeds. Published at the same speed as the Joystick message
         self.publisher = self.create_publisher(WheelSpeeds, "wheel_speeds", 10)
 
         self.get_logger().info("Manual Motor Controller initialized")
