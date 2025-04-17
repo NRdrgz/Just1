@@ -10,7 +10,7 @@
   <buildtool_depend>ament_python</buildtool_depend>
   <depend>rclpy</depend>
   <depend>sensor_msgs</depend>
-
+  <depend>pygame</depend>
 
   <export>
     <build_type>ament_python</build_type>
