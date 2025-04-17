@@ -11,11 +11,9 @@
   <depend>rclpy</depend>
   <depend>sensor_msgs</depend>
   <depend>robot_utils</depend>
+  <depend>rosidl_runtime_py</depend>
   <build_depend>rosidl_default_generators</build_depend>
-
-  <exec_depend>rosidl_default_runtime</exec_depend>
-
-  <member_of_group>rosidl_interface_packages</member_of_group>
+  <exec_depend>rosidl_runtime_py</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>

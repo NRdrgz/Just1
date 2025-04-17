@@ -11,7 +11,7 @@ setup(
         ("share/" + package_name, ["package.xml"]),
         ("share/" + package_name + "/msg", ["msg/WheelSpeeds.msg"]),
     ],
-    install_requires=["setuptools"],
+    install_requires=["setuptools", "rosidl_runtime_py"],
     zip_safe=True,
     maintainer="Nico",
     maintainer_email="nicolasrdrgzrosdev@protonmail.com",
