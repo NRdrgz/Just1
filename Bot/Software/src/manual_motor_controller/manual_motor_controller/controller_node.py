@@ -40,15 +40,14 @@ class ManualMotorController(Node):
         speeds_msg.back_right = float(wheel_speeds["back_right"])
         self.publisher.publish(speeds_msg)
 
-    def calculate_wheel_speeds(vertical_value, horizontal_value):
+    def calculate_wheel_speeds(self, vertical_value, horizontal_value):
         """
         Calculate the speed for each wheel based on vertical and horizontal values.
-        See controller_motor_guide.png for the controller mapping.
         Values range from -1 to 1, where:
         - vertical: -1 is full forward, 1 is full backward
         - horizontal: -1 is full left, 1 is full right
 
-        Returns a dictionary with speeds for each wheel (0-100)
+        Returns a dictionary with speeds for each wheel (-100 to 100)
         """
         # Initialize speeds
         speeds = {"front_left": 0, "front_right": 0, "back_left": 0, "back_right": 0}
@@ -57,15 +56,15 @@ class ManualMotorController(Node):
         if abs(vertical_value) <= 0.1 and abs(horizontal_value) <= 0.1:
             return speeds
 
-        # Calculate base speed (0-100)
-        vertical_speed = abs(vertical_value) * 100
-        horizontal_speed = abs(horizontal_value) * 100
+        # Calculate base speed (-100 to 100)
+        vertical_speed = -vertical_value * 100
+        horizontal_speed = horizontal_value * 100
 
         # Handle vertical movement
         if vertical_value < -0.1:  # Forward
             speeds = {wheel: vertical_speed for wheel in speeds.keys()}
         elif vertical_value > 0.1:  # Backward
-            speeds = {wheel: -vertical_speed for wheel in speeds.keys()}
+            speeds = {wheel: vertical_speed for wheel in speeds.keys()}
 
         # Handle horizontal movement
         if horizontal_value < -0.1:  # Turn left
@@ -73,24 +72,19 @@ class ManualMotorController(Node):
             speeds["front_right"] += horizontal_speed
             speeds["back_right"] += horizontal_speed
             # Left wheels get reduced speed
-            speeds["front_left"] = max(0, speeds["front_left"] - horizontal_speed)
-            speeds["back_left"] = max(0, speeds["back_left"] - horizontal_speed)
+            speeds["front_left"] = max(-100, speeds["front_left"] - horizontal_speed)
+            speeds["back_left"] = max(-100, speeds["back_left"] - horizontal_speed)
         elif horizontal_value > 0.1:  # Turn right
             # Left wheels get additional speed
             speeds["front_left"] += horizontal_speed
             speeds["back_left"] += horizontal_speed
             # Right wheels get reduced speed
-            speeds["front_right"] = max(0, speeds["front_right"] - horizontal_speed)
-            speeds["back_right"] = max(0, speeds["back_right"] - horizontal_speed)
+            speeds["front_right"] = max(-100, speeds["front_right"] - horizontal_speed)
+            speeds["back_right"] = max(-100, speeds["back_right"] - horizontal_speed)
 
-        # Ensure speeds are within 0-100 range
+        # Ensure speeds are within -100 to 100 range
         for wheel in speeds:
-            speeds[wheel] = max(0, min(100, abs(speeds[wheel])))
-
-        # Make the speed negative to signify backward if vertical value is < 0
-        if vertical_value < 0:
-            for wheel in speeds:
-                speeds[wheel] = -speeds[wheel]
+            speeds[wheel] = max(-100, min(100, speeds[wheel]))
 
         return speeds
 
