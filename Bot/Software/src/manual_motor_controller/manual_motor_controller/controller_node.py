@@ -34,10 +34,10 @@ class ManualMotorController(Node):
 
         # Publish wheel speeds
         speeds_msg = WheelSpeeds()
-        speeds_msg.front_left = wheel_speeds["front_left"]
-        speeds_msg.front_right = wheel_speeds["front_right"]
-        speeds_msg.back_left = wheel_speeds["back_left"]
-        speeds_msg.back_right = wheel_speeds["back_right"]
+        speeds_msg.front_left = float(wheel_speeds["front_left"])
+        speeds_msg.front_right = float(wheel_speeds["front_right"])
+        speeds_msg.back_left = float(wheel_speeds["back_left"])
+        speeds_msg.back_right = float(wheel_speeds["back_right"])
         self.publisher.publish(speeds_msg)
 
     def calculate_wheel_speeds(self, vertical_value, horizontal_value):
