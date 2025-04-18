@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
-from manual_motor_controller.msg import WheelSpeeds
+from robot_interface.msg import WheelSpeeds
 from robot_utils.motor_control import setup, stop_all, control_wheel, cleanup
 
 

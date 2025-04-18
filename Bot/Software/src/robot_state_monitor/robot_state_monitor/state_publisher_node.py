@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from manual_motor_controller.msg import WheelSpeeds
+from robot_interface.msg import WheelSpeeds
 
 
 class RobotStateMonitor(Node):
