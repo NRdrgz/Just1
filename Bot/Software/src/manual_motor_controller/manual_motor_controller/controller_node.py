@@ -57,7 +57,7 @@ class ManualMotorController(Node):
             return speeds
 
         # Calculate base speed (-100 to 100)
-        vertical_speed = vertical_value * 100
+        vertical_speed = -vertical_value * 100
         horizontal_speed = horizontal_value * 100
 
         # Handle vertical movement
