@@ -73,19 +73,17 @@ class DiagnosticsNode(Node):
         print("Press Ctrl+C to exit")
         print("Waiting for joystick data...")
 
-        try:
-            while True:
-                if self.joystick_data is not None:
-                    print("\n" + "=" * 50)
-                    print("Joystick Data:")
-                    print(f"Axes: {[f'{x:.2f}' for x in self.joystick_data.axes]}")
-                    print(f"Buttons: {self.joystick_data.buttons}")
-                    print("=" * 50)
-                time.sleep(0.1)  # Reduce CPU usage
-        except KeyboardInterrupt:
-            print("\nExiting joystick test mode...")
-            self.cleanup_and_shutdown()
-            return
+        # Create a timer to periodically check joystick data
+        self.timer = self.create_timer(0.1, self.print_joystick_data)
+
+    def print_joystick_data(self):
+        """Print joystick data periodically"""
+        if self.joystick_data is not None:
+            print("\n" + "=" * 50)
+            print("Joystick Data:")
+            print(f"Axes: {[f'{x:.2f}' for x in self.joystick_data.axes]}")
+            print(f"Buttons: {self.joystick_data.buttons}")
+            print("=" * 50)
 
     def test_wheel(self, wheel_name):
         """Test a specific wheel"""
