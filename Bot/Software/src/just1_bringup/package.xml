@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>robot_bringup</name>
+  <name>just1_bringup</name>
   <version>0.0.1</version>
   <description>Launch files and configurations for bringing up the robot</description>
   <maintainer email="nicolasrdrgzrosdev@protonmail.com">Nico</maintainer>
