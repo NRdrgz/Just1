@@ -57,7 +57,7 @@ def generate_launch_description():
     # Set environment variable to prevent joystick node from taking input focus
     ld.add_action(SetEnvironmentVariable("SDL_VIDEODRIVER", "dummy"))
 
-    # Diagnostics mode nodes (start first)
+    # Diagnostics mode nodes
     diagnostics_node = Node(
         package="just1_diagnostics",
         executable="diagnostics_node",
@@ -77,7 +77,7 @@ def generate_launch_description():
     )
     ld.add_action(diagnostics_node)
 
-    # Joystick driver node (start after diagnostics)
+    # Joystick driver node
     joystick_node = Node(
         package="just1_joystick_driver",
         executable="joystick_node",

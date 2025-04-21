@@ -34,11 +34,6 @@ class DiagnosticsNode(Node):
         # Run diagnostics based on parameters
         self.run_diagnostics()
 
-        # Cleanup
-        cleanup()
-        self.get_logger().info("Diagnostics completed")
-        rclpy.shutdown()
-
     def joystick_callback(self, msg):
         """Callback for joystick messages"""
         self.joystick_data = msg
@@ -56,12 +51,21 @@ class DiagnosticsNode(Node):
 
         if test_wheel:
             self.test_wheel(test_wheel)
+            self.cleanup_and_shutdown()
         elif test_movement:
             self.test_movement(test_movement, speed)
+            self.cleanup_and_shutdown()
         elif test_joystick:
             self.test_joystick()
         else:
             self.get_logger().error("No valid test option specified")
+            self.cleanup_and_shutdown()
+
+    def cleanup_and_shutdown(self):
+        """Cleanup and shutdown the node"""
+        cleanup()
+        self.get_logger().info("Diagnostics completed")
+        rclpy.shutdown()
 
     def test_joystick(self):
         """Display joystick values"""
@@ -80,6 +84,7 @@ class DiagnosticsNode(Node):
                 time.sleep(0.1)  # Reduce CPU usage
         except KeyboardInterrupt:
             print("\nExiting joystick test mode...")
+            self.cleanup_and_shutdown()
             return
 
     def test_wheel(self, wheel_name):
@@ -222,7 +227,8 @@ def main(args=None):
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        pass
+        node.get_logger().info("Keyboard interrupt received, shutting down...")
+        node.cleanup_and_shutdown()
     finally:
         node.destroy_node()
         rclpy.shutdown()
