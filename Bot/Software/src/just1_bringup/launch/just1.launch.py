@@ -3,7 +3,6 @@ from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.conditions import IfCondition
-from launch.actions import SetEnvironmentVariable
 
 
 def generate_launch_description():
@@ -18,22 +17,7 @@ def generate_launch_description():
     )
     ld.add_action(mode_arg)
 
-    # Set environment variable to prevent joystick node from taking input focus
-    ld.add_action(SetEnvironmentVariable("SDL_VIDEODRIVER", "dummy"))
-
-    # Diagnostics mode nodes (start first)
-    diagnostics_node = Node(
-        package="just1_diagnostics",
-        executable="diagnostics_node",
-        name="just1_diagnostics",
-        output="screen",
-        condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'diagnostics'"])
-        ),
-    )
-    ld.add_action(diagnostics_node)
-
-    # Joystick driver node (start after diagnostics)
+    # Joystick driver node (used in both modes)
     joystick_node = Node(
         package="just1_joystick_driver",
         executable="joystick_node",
@@ -64,5 +48,17 @@ def generate_launch_description():
         ),
     )
     ld.add_action(state_publisher_node)
+
+    # Diagnostics mode nodes
+    diagnostics_node = Node(
+        package="just1_diagnostics",
+        executable="diagnostics_node",
+        name="just1_diagnostics",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'diagnostics'"])
+        ),
+    )
+    ld.add_action(diagnostics_node)
 
     return ld
