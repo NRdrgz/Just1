@@ -49,8 +49,8 @@ def generate_launch_description():
     )
     ld.add_action(state_publisher_node)
 
-    # Test mode nodes
-    test_node = Node(
+    # Diagnostics mode nodes
+    diagnostics_node = Node(
         package="just1_diagnostics",
         executable="diagnostics_node",
         name="just1_diagnostics",
@@ -59,6 +59,6 @@ def generate_launch_description():
             PythonExpression(["'", LaunchConfiguration("mode"), "' == 'diagnostics'"])
         ),
     )
-    ld.add_action(test_node)
+    ld.add_action(diagnostics_node)
 
     return ld

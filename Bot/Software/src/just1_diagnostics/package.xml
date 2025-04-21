@@ -11,7 +11,7 @@
 
   <depend>rclpy</depend>
   <depend>just1_utils</depend>
-
+  <depend>sensor_msgs</depend>
 
   <export>
     <build_type>ament_python</build_type>
