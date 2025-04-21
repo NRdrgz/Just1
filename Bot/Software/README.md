@@ -19,6 +19,12 @@ This is a ROS2-based control system for a four-wheeled robot with joystick contr
    pip install -r requirements.txt
    ```
 
+   Set Python path manually so that ROS can use packages from the venv
+   ```bash
+   export PYTHONPATH=/path/to/your/venv/lib/python3.x/site-packages:$PYTHONPATH
+   ```
+
+
 3. Build the packages:
    ```bash
    colcon build --symlink-install
