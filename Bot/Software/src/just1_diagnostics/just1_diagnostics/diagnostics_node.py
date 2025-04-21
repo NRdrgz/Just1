@@ -1,7 +1,6 @@
 import rclpy
 from rclpy.node import Node
 import time
-import threading
 from just1_utils.motor_control import (
     setup,
     stop_all,
@@ -26,12 +25,13 @@ class DiagnosticsNode(Node):
         )
         self.joystick_data = None
 
-        # Flag to control menu thread
-        self.running = True
+        # Run diagnostics menu
+        self.run_diagnostics_menu()
 
-        # Start menu in a separate thread
-        self.menu_thread = threading.Thread(target=self.run_diagnostics_menu)
-        self.menu_thread.start()
+        # Cleanup
+        cleanup()
+        self.get_logger().info("Diagnostics completed")
+        rclpy.shutdown()
 
     def joystick_callback(self, msg):
         """Callback for joystick messages"""
@@ -39,7 +39,7 @@ class DiagnosticsNode(Node):
 
     def run_diagnostics_menu(self):
         """Run the diagnostics menu"""
-        while self.running:
+        while True:
             print("\nDiagnostics Menu:")
             print("1: Test Individual Wheels")
             print("2: Test Movements")
@@ -55,7 +55,6 @@ class DiagnosticsNode(Node):
             elif choice == "3":
                 self.test_joystick()
             elif choice == "4":
-                self.running = False
                 break
             else:
                 print("Invalid choice! Please select 1-4")
@@ -63,21 +62,21 @@ class DiagnosticsNode(Node):
     def test_joystick(self):
         """Display joystick values"""
         print("\nJoystick Test Mode")
-        print("Press Enter to exit")
+        print("Press Ctrl+C to exit")
         print("Waiting for joystick data...")
 
-        while self.running:
-            if self.joystick_data is not None:
-                print("\n" + "=" * 50)
-                print("Joystick Data:")
-                print(f"Axes: {[f'{x:.2f}' for x in self.joystick_data.axes]}")
-                print(f"Buttons: {self.joystick_data.buttons}")
-                print("=" * 50)
-            time.sleep(0.1)  # Reduce CPU usage
-
-            # Check if Enter was pressed
-            if input() == "":
-                break
+        try:
+            while True:
+                if self.joystick_data is not None:
+                    print("\n" + "=" * 50)
+                    print("Joystick Data:")
+                    print(f"Axes: {[f'{x:.2f}' for x in self.joystick_data.axes]}")
+                    print(f"Buttons: {self.joystick_data.buttons}")
+                    print("=" * 50)
+                time.sleep(0.1)  # Reduce CPU usage
+        except KeyboardInterrupt:
+            print("\nExiting joystick test mode...")
+            return
 
     def test_wheels_menu(self):
         """Menu for testing individual wheels"""
@@ -285,14 +284,6 @@ class DiagnosticsNode(Node):
             time.sleep(duration)
             stop_all()
             time.sleep(0.5)
-
-    def destroy_node(self):
-        """Override destroy_node to clean up properly"""
-        self.running = False
-        if hasattr(self, "menu_thread"):
-            self.menu_thread.join()
-        cleanup()
-        super().destroy_node()
 
 
 def main(args=None):
