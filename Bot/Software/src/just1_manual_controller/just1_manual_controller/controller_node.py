@@ -6,6 +6,15 @@ from just1_utils.motor_control import setup, stop_all, control_wheel, cleanup
 
 
 class ManualMotorController(Node):
+    """
+    This node is used to control the robot using a joystick.
+    It subscribes to the joystick topic and publishes the wheel speeds to the wheel_speeds topic.
+    The left stick is used to control the robot and make it move forward, backward, and turn left and right.
+    The right stick is used to control the robot and make it spin clockwise and counterclockwise, or move laterally left or right.
+    The left stick has priority over the right stick. The left stick must be in deadzone for right stick to be used.
+    A deadzone of 0.1 is applied to the joystick to prevent the robot from moving when the controller is in the center.
+    """
+
     def __init__(self):
         super().__init__("manual_motor_controller")
 
@@ -22,11 +31,22 @@ class ManualMotorController(Node):
 
     def joy_callback(self, msg):
         # Get joystick values from the left stick
-        vertical_value = msg.axes[1]  # Left stick vertical
-        horizontal_value = msg.axes[0]  # Left stick horizontal
+        vertical_value_left = msg.axes[1]  # Left stick vertical
+        horizontal_value_left = msg.axes[0]  # Left stick horizontal
 
-        # Calculate wheel speeds
-        wheel_speeds = self.calculate_wheel_speeds(vertical_value, horizontal_value)
+        vertical_value_right = msg.axes[3]  # Right stick vertical
+        horizontal_value_right = msg.axes[2]  # Right stick horizontal
+
+        # Check if left stick is out of deadzone and if so, calculate wheel speeds
+        if abs(vertical_value_left) > 0.1 or abs(horizontal_value_left) > 0.1:
+            wheel_speeds = self.calculate_wheel_speeds_left_stick(
+                vertical_value_left, horizontal_value_left
+            )
+        # Else, use right stick values to control the robot
+        else:
+            wheel_speeds = self.calculate_wheel_speeds_right_stick(
+                vertical_value_right, horizontal_value_right
+            )
 
         # Apply speeds to wheels
         for wheel, speed in wheel_speeds.items():
@@ -40,7 +60,7 @@ class ManualMotorController(Node):
         speeds_msg.back_right = float(wheel_speeds["back_right"])
         self.publisher.publish(speeds_msg)
 
-    def calculate_wheel_speeds(self, vertical_value, horizontal_value):
+    def calculate_wheel_speeds_left_stick(self, vertical_value, horizontal_value):
         """
         Calculate the speed for each wheel based on vertical and horizontal values of the left joystick.
         Values range from -1 to 1, where:
@@ -58,7 +78,7 @@ class ManualMotorController(Node):
         if abs(vertical_value) <= 0.1 and abs(horizontal_value) <= 0.1:
             return speeds
 
-        # Calculate base speed (-100 to 100)
+        # Calculate base speed (0 to 100)
         vertical_speed = abs(vertical_value) * 100
         horizontal_speed = abs(horizontal_value) * 100
 
@@ -84,6 +104,55 @@ class ManualMotorController(Node):
             speeds["front_right"] = max(0, speeds["front_right"] - horizontal_speed)
             speeds["back_right"] = max(0, speeds["back_right"] - horizontal_speed)
 
+        # Ensure speeds are within -100 to 100 range
+        for wheel in speeds:
+            speeds[wheel] = max(-100, min(100, speeds[wheel]))
+
+        return speeds
+
+    def calculate_wheel_speeds_right_stick(self, vertical_value, horizontal_value):
+        """
+        Calculate the speed for each wheel based on vertical and horizontal values of the right joystick.
+        Values range from -1 to 1, where:
+        - vertical: -1 is spin clockwise, 1 is spin counterclockwise
+        - horizontal: -1 is move laterally left, 1 is move laterally right
+
+        The movement cannot be at the same time horizontal and vertical. The highest speed will be used.
+        """
+        speeds = {"front_left": 0, "front_right": 0, "back_left": 0, "back_right": 0}
+
+        # Apply deadzone so that the robot doesn't move when the controller is in the center
+        if abs(vertical_value) <= 0.1 and abs(horizontal_value) <= 0.1:
+            return speeds
+
+        # Calculate base speed (0 to 100)
+        vertical_speed = abs(vertical_value) * 100
+        horizontal_speed = abs(horizontal_value) * 100
+
+        # Handle vertical movement
+        if vertical_speed >= horizontal_speed:
+            if vertical_value < -0.1:  # Spin clockwise
+                speeds["front_left"] = vertical_speed
+                speeds["front_right"] = -vertical_speed
+                speeds["back_left"] = vertical_speed
+                speeds["back_right"] = -vertical_speed
+            elif vertical_value > 0.1:  # Spin counterclockwise
+                speeds["front_left"] = -vertical_speed
+                speeds["front_right"] = vertical_speed
+                speeds["back_left"] = -vertical_speed
+                speeds["back_right"] = vertical_speed
+        # Handle horizontal movement
+        elif horizontal_speed >= vertical_speed:
+            if horizontal_value < -0.1:  # Move laterally left
+                speeds["front_left"] = -horizontal_speed
+                speeds["front_right"] = horizontal_speed
+                speeds["back_left"] = horizontal_speed
+                speeds["back_right"] = -horizontal_speed
+            elif horizontal_value > 0.1:  # Move laterally right
+                speeds["front_left"] = horizontal_speed
+                speeds["front_right"] = -horizontal_speed
+                speeds["back_left"] = -horizontal_speed
+                speeds["back_right"] = horizontal_speed
         # Ensure speeds are within -100 to 100 range
         for wheel in speeds:
             speeds[wheel] = max(-100, min(100, speeds[wheel]))
