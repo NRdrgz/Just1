@@ -16,6 +16,12 @@ class DiagnosticsNode(Node):
         super().__init__("diagnostics_node")
         self.get_logger().info("Diagnostics Node initialized")
 
+        # Declare parameters
+        self.declare_parameter("test_wheel", "")
+        self.declare_parameter("test_movement", "")
+        self.declare_parameter("test_joystick", False)
+        self.declare_parameter("speed", 50)
+
         # Initialize GPIO and motors
         setup()
 
@@ -25,8 +31,8 @@ class DiagnosticsNode(Node):
         )
         self.joystick_data = None
 
-        # Run diagnostics menu
-        self.run_diagnostics_menu()
+        # Run diagnostics based on parameters
+        self.run_diagnostics()
 
         # Cleanup
         cleanup()
@@ -37,27 +43,25 @@ class DiagnosticsNode(Node):
         """Callback for joystick messages"""
         self.joystick_data = msg
 
-    def run_diagnostics_menu(self):
-        """Run the diagnostics menu"""
-        while True:
-            print("\nDiagnostics Menu:")
-            print("1: Test Individual Wheels")
-            print("2: Test Movements")
-            print("3: Test Joystick")
-            print("4: Exit")
+    def run_diagnostics(self):
+        """Run diagnostics based on parameters"""
+        test_wheel = self.get_parameter("test_wheel").get_parameter_value().string_value
+        test_movement = (
+            self.get_parameter("test_movement").get_parameter_value().string_value
+        )
+        test_joystick = (
+            self.get_parameter("test_joystick").get_parameter_value().bool_value
+        )
+        speed = self.get_parameter("speed").get_parameter_value().integer_value
 
-            choice = input("Select option (1-4): ")
-
-            if choice == "1":
-                self.test_wheels_menu()
-            elif choice == "2":
-                self.test_movements_menu()
-            elif choice == "3":
-                self.test_joystick()
-            elif choice == "4":
-                break
-            else:
-                print("Invalid choice! Please select 1-4")
+        if test_wheel:
+            self.test_wheel(test_wheel)
+        elif test_movement:
+            self.test_movement(test_movement, speed)
+        elif test_joystick:
+            self.test_joystick()
+        else:
+            self.get_logger().error("No valid test option specified")
 
     def test_joystick(self):
         """Display joystick values"""
@@ -78,115 +82,40 @@ class DiagnosticsNode(Node):
             print("\nExiting joystick test mode...")
             return
 
-    def test_wheels_menu(self):
-        """Menu for testing individual wheels"""
-        while True:
-            print("\nWheel Test Menu:")
-            print("1: Front Left")
-            print("2: Front Right")
-            print("3: Back Left")
-            print("4: Back Right")
-            print("5: Stop All")
-            print("6: Back to Main Menu")
+    def test_wheel(self, wheel_name):
+        """Test a specific wheel"""
+        self.get_logger().info(f"Testing {wheel_name} wheel")
+        test_wheel(wheel_name)
+        time.sleep(2)
+        stop_all()
 
-            choice = input("Select wheel to test (1-6): ")
+    def test_movement(self, movement_name, speed):
+        """Test a specific movement"""
+        self.get_logger().info(f"Testing {movement_name} movement at speed {speed}")
 
-            if choice == "1":
-                self.get_logger().info("Testing Front Left wheel")
-                test_wheel("front_left")
-            elif choice == "2":
-                self.get_logger().info("Testing Front Right wheel")
-                test_wheel("front_right")
-            elif choice == "3":
-                self.get_logger().info("Testing Back Left wheel")
-                test_wheel("back_left")
-            elif choice == "4":
-                self.get_logger().info("Testing Back Right wheel")
-                test_wheel("back_right")
-            elif choice == "5":
-                self.get_logger().info("Stopping all motors")
-                stop_all()
-            elif choice == "6":
-                break
-            else:
-                print("Invalid choice! Please select 1-6")
+        movement_map = {
+            "forward": self.move_forward,
+            "backward": self.move_backward,
+            "left": self.move_left,
+            "right": self.move_right,
+            "spin_clockwise": self.spin_clockwise,
+            "spin_counterclockwise": self.spin_counterclockwise,
+            "diagonal_forward_right": self.move_diagonal_forward_right,
+            "diagonal_forward_left": self.move_diagonal_forward_left,
+            "diagonal_backward_right": self.move_diagonal_backward_right,
+            "diagonal_backward_left": self.move_diagonal_backward_left,
+            "curve_right": self.move_curve_to_right,
+            "curve_left": self.move_curve_to_left,
+            "lateral_arc": self.move_lateral_arc,
+            "square": self.do_square,
+        }
 
-    def test_movements_menu(self):
-        """Menu for testing different movements"""
-        SPEED = 50
-        while True:
-            print("\nMovement Test Menu:")
-            print("1: Forward")
-            print("2: Backward")
-            print("3: Left")
-            print("4: Right")
-            print("5: Spin Clockwise")
-            print("6: Spin Counterclockwise")
-            print("7: Diagonal Forward-Right")
-            print("8: Diagonal Forward-Left")
-            print("9: Diagonal Backward-Right")
-            print("10: Diagonal Backward-Left")
-            print("11: Curve to Right")
-            print("12: Curve to Left")
-            print("13: Lateral Arc")
-            print("14: Do Square Pattern")
-            print("15: Stop All")
-            print("16: Back to Main Menu")
-
-            choice = input("Select movement (1-16): ")
-
-            if choice == "16":
-                break
-            elif choice == "15":
-                stop_all()
-            elif choice == "1":
-                self.get_logger().info("Moving forward")
-                self.move_forward(SPEED)
-            elif choice == "2":
-                self.get_logger().info("Moving backward")
-                self.move_backward(SPEED)
-            elif choice == "3":
-                self.get_logger().info("Moving left")
-                self.move_left(SPEED)
-            elif choice == "4":
-                self.get_logger().info("Moving right")
-                self.move_right(SPEED)
-            elif choice == "5":
-                self.get_logger().info("Spinning clockwise")
-                self.spin_clockwise(SPEED)
-            elif choice == "6":
-                self.get_logger().info("Spinning counterclockwise")
-                self.spin_counterclockwise(SPEED)
-            elif choice == "7":
-                self.get_logger().info("Moving diagonal forward-right")
-                self.move_diagonal_forward_right(SPEED)
-            elif choice == "8":
-                self.get_logger().info("Moving diagonal forward-left")
-                self.move_diagonal_forward_left(SPEED)
-            elif choice == "9":
-                self.get_logger().info("Moving diagonal backward-right")
-                self.move_diagonal_backward_right(SPEED)
-            elif choice == "10":
-                self.get_logger().info("Moving diagonal backward-left")
-                self.move_diagonal_backward_left(SPEED)
-            elif choice == "11":
-                self.get_logger().info("Moving curve to right")
-                self.move_curve_to_right(SPEED)
-            elif choice == "12":
-                self.get_logger().info("Moving curve to left")
-                self.move_curve_to_left(SPEED)
-            elif choice == "13":
-                self.get_logger().info("Moving lateral arc")
-                self.move_lateral_arc(SPEED)
-            elif choice == "14":
-                self.get_logger().info("Executing square pattern")
-                self.do_square(SPEED)
-            else:
-                print("Invalid choice! Please select 1-16")
-
-            if choice not in ["15", "16"]:
-                time.sleep(2)
-                stop_all()
+        if movement_name in movement_map:
+            movement_map[movement_name](speed)
+            time.sleep(2)
+            stop_all()
+        else:
+            self.get_logger().error(f"Invalid movement name: {movement_name}")
 
     # Movement functions
     def move_forward(self, speed):

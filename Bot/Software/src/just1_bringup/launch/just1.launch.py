@@ -18,6 +18,42 @@ def generate_launch_description():
     )
     ld.add_action(mode_arg)
 
+    # Add arguments for diagnostics
+
+    # To test wheel, run:
+    # ros2 launch just1_bringup just1.launch.py mode:=diagnostics test_wheel:=front_left
+    test_wheel_arg = DeclareLaunchArgument(
+        "test_wheel",
+        default_value="",
+        description="Wheel to test (front_left, front_right, back_left, back_right)",
+    )
+    ld.add_action(test_wheel_arg)
+
+    # To test movement, run:
+    # ros2 launch just1_bringup just1.launch.py mode:=diagnostics test_movement:=forward speed:=75
+    test_movement_arg = DeclareLaunchArgument(
+        "test_movement",
+        default_value="",
+        description="Movement to test (forward, backward, left, right, etc.)",
+    )
+    ld.add_action(test_movement_arg)
+
+    # To test joystick, run:
+    # ros2 launch just1_bringup just1.launch.py mode:=diagnostics test_joystick:=True
+    test_joystick_arg = DeclareLaunchArgument(
+        "test_joystick",
+        default_value="False",
+        description="Whether to test joystick",
+    )
+    ld.add_action(test_joystick_arg)
+
+    speed_arg = DeclareLaunchArgument(
+        "speed",
+        default_value="50",
+        description="Movement speed (default: 50)",
+    )
+    ld.add_action(speed_arg)
+
     # Set environment variable to prevent joystick node from taking input focus
     ld.add_action(SetEnvironmentVariable("SDL_VIDEODRIVER", "dummy"))
 
@@ -27,6 +63,14 @@ def generate_launch_description():
         executable="diagnostics_node",
         name="just1_diagnostics",
         output="screen",
+        parameters=[
+            {
+                "test_wheel": LaunchConfiguration("test_wheel"),
+                "test_movement": LaunchConfiguration("test_movement"),
+                "test_joystick": LaunchConfiguration("test_joystick"),
+                "speed": LaunchConfiguration("speed"),
+            }
+        ],
         condition=IfCondition(
             PythonExpression(["'", LaunchConfiguration("mode"), "' == 'diagnostics'"])
         ),
