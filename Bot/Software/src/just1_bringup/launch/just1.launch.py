@@ -40,7 +40,7 @@ def generate_launch_description():
 
     state_publisher_node = Node(
         package="just1_state_monitor",
-        executable="state_publisher_node",
+        executable="state_monitor_node",
         name="just1_state_monitor",
         output="screen",
         condition=IfCondition(
