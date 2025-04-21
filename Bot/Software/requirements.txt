@@ -3,5 +3,5 @@ gpiozero==2.0
 lgpio==0.2.2.0
 pytest==8.0.0
 empy
-catking_pkg
+catkin_pkg
 numpy
