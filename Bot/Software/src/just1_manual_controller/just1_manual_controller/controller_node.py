@@ -21,7 +21,7 @@ class ManualMotorController(Node):
         self.get_logger().info("Manual Motor Controller initialized")
 
     def joy_callback(self, msg):
-        # Get joystick values (assuming left stick)
+        # Get joystick values from the left stick
         vertical_value = msg.axes[1]  # Left stick vertical
         horizontal_value = msg.axes[0]  # Left stick horizontal
 
@@ -42,12 +42,14 @@ class ManualMotorController(Node):
 
     def calculate_wheel_speeds(self, vertical_value, horizontal_value):
         """
-        Calculate the speed for each wheel based on vertical and horizontal values.
+        Calculate the speed for each wheel based on vertical and horizontal values of the left joystick.
         Values range from -1 to 1, where:
         - vertical: -1 is full forward, 1 is full backward
         - horizontal: -1 is full left, 1 is full right
 
         Returns a dictionary with speeds for each wheel (-100 to 100)
+
+        It first assigns base speed depending on the vertical value. Then it adds horizontal speed to the right wheels depending on the horizontal value in order to turn left or right.
         """
         # Initialize speeds
         speeds = {"front_left": 0, "front_right": 0, "back_left": 0, "back_right": 0}
@@ -57,14 +59,14 @@ class ManualMotorController(Node):
             return speeds
 
         # Calculate base speed (-100 to 100)
-        vertical_speed = -vertical_value * 100
-        horizontal_speed = horizontal_value * 100
+        vertical_speed = abs(vertical_value) * 100
+        horizontal_speed = abs(horizontal_value) * 100
 
         # Handle vertical movement
         if vertical_value < -0.1:  # Forward
             speeds = {wheel: vertical_speed for wheel in speeds.keys()}
         elif vertical_value > 0.1:  # Backward
-            speeds = {wheel: vertical_speed for wheel in speeds.keys()}
+            speeds = {wheel: -vertical_speed for wheel in speeds.keys()}
 
         # Handle horizontal movement
         if horizontal_value < -0.1:  # Turn left
@@ -72,15 +74,15 @@ class ManualMotorController(Node):
             speeds["front_right"] += horizontal_speed
             speeds["back_right"] += horizontal_speed
             # Left wheels get reduced speed
-            speeds["front_left"] = max(-100, speeds["front_left"] - horizontal_speed)
-            speeds["back_left"] = max(-100, speeds["back_left"] - horizontal_speed)
+            speeds["front_left"] = max(0, speeds["front_left"] - horizontal_speed)
+            speeds["back_left"] = max(0, speeds["back_left"] - horizontal_speed)
         elif horizontal_value > 0.1:  # Turn right
             # Left wheels get additional speed
             speeds["front_left"] += horizontal_speed
             speeds["back_left"] += horizontal_speed
             # Right wheels get reduced speed
-            speeds["front_right"] = max(-100, speeds["front_right"] - horizontal_speed)
-            speeds["back_right"] = max(-100, speeds["back_right"] - horizontal_speed)
+            speeds["front_right"] = max(0, speeds["front_right"] - horizontal_speed)
+            speeds["back_right"] = max(0, speeds["back_right"] - horizontal_speed)
 
         # Ensure speeds are within -100 to 100 range
         for wheel in speeds:
