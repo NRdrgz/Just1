@@ -44,6 +44,8 @@ class CameraNode(Node):
         # Convert frame to ROS2 message
         try:
             msg = self.bridge.cv2_to_imgmsg(frame, "bgr8")
+            self.get_logger().info(f"Publishing frame with shape: {frame.shape}")
+
             self.publisher.publish(msg)
         except Exception as e:
             self.get_logger().error(f"Error converting frame: {e}")
