@@ -20,6 +20,7 @@ setup(
     entry_points={
         "console_scripts": [
             "camera_node = just1_camera.camera_node:main",
+            "camera_websocket = just1_camera.camera_web_socket:main",
         ],
     },
 )
