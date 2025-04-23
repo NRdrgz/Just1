@@ -11,7 +11,7 @@ import threading
 
 class CameraWebSocketBridge(Node):
     def __init__(self):
-        super().__init__("camera_websocket_bridge")
+        super().__init__("camera_web_socket")
         self.bridge = CvBridge()
 
         # Subscribe to the image topic

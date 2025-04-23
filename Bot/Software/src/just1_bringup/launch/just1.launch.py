@@ -98,17 +98,6 @@ def generate_launch_description():
     )
     ld.add_action(manual_controller_node)
 
-    state_publisher_node = Node(
-        package="just1_state_monitor",
-        executable="state_monitor_node",
-        name="just1_state_monitor",
-        output="screen",
-        condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
-        ),
-    )
-    ld.add_action(state_publisher_node)
-
     # Camera node
     camera_node = Node(
         package="just1_camera",
