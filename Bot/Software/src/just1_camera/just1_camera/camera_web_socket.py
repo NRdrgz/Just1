@@ -32,9 +32,19 @@ class CameraWebSocketBridge(Node):
             # Convert ROS image message to OpenCV
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
+            # Resize (just resizing width to 500px, keeping aspect ratio)
+            width = 500
+            height = int((cv_image.shape[0] / cv_image.shape[1]) * width)
+            cv_image = cv2.resize(cv_image, (width, height))
+
             # Encode the image as JPEG
             _, jpeg = cv2.imencode(".jpg", cv_image)
-            b64_data = base64.b64encode(jpeg).decode("utf-8")
+
+            # Convert the encoded image to bytes
+            img_bytes = jpeg.tobytes()
+
+            # Encode the image to base64
+            b64_data = base64.b64encode(img_bytes).decode("utf-8")
 
             # Send the base64 image to all connected clients
             await self.broadcast(b64_data)

@@ -8,3 +8,4 @@ numpy
 lark
 opencv-python
 cv_bridge
+websockets
