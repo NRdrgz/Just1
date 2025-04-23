@@ -98,18 +98,6 @@ def generate_launch_description():
     )
     ld.add_action(manual_controller_node)
 
-    # State monitor node
-    state_monitor_node = Node(
-        package="just1_state_monitor",
-        executable="state_monitor_node",
-        name="just1_state_monitor",
-        output="screen",
-        condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
-        ),
-    )
-    ld.add_action(state_monitor_node)
-
     # Camera node
     camera_node = Node(
         package="just1_camera",
@@ -121,5 +109,17 @@ def generate_launch_description():
         ),
     )
     ld.add_action(camera_node)
+
+    # Camera web socket node
+    camera_web_socket_node = Node(
+        package="just1_camera",
+        executable="camera_web_socket",
+        name="just1_camera_web_socket",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
+    )
+    ld.add_action(camera_web_socket_node)
 
     return ld
