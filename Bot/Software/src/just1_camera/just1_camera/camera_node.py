@@ -32,16 +32,21 @@ class CameraNode(Node):
 
     def timer_callback(self):
         ret, frame = self.cap.read()
-        frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)  # Convert grayscale to BGR
-        if ret:
-            # Convert frame to ROS2 message
-            try:
-                msg = self.bridge.cv2_to_imgmsg(frame, "bgr8")
-                self.publisher.publish(msg)
-            except Exception as e:
-                self.get_logger().error(f"Error converting frame: {e}")
-        else:
+
+        if not ret:
             self.get_logger().error("Failed to capture frame")
+            return
+
+        # If the frame is grayscale (2D), convert to BGR
+        if len(frame.shape) == 2:
+            frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+
+        # Convert frame to ROS2 message
+        try:
+            msg = self.bridge.cv2_to_imgmsg(frame, "bgr8")
+            self.publisher.publish(msg)
+        except Exception as e:
+            self.get_logger().error(f"Error converting frame: {e}")
 
     def __del__(self):
         if hasattr(self, "cap"):
