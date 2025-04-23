@@ -36,6 +36,7 @@ class CameraNode(Node):
         if not ret:
             self.get_logger().error("Failed to capture frame")
             return
+        self.get_logger().info(f"Raw frame shape: {frame.shape}, dtype: {frame.dtype}")
 
         # If the frame is grayscale (2D), convert to BGR
         if len(frame.shape) == 2:
