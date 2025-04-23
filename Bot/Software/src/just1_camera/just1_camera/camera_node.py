@@ -32,6 +32,7 @@ class CameraNode(Node):
 
     def timer_callback(self):
         ret, frame = self.cap.read()
+        frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)  # Convert grayscale to BGR
         if ret:
             # Convert frame to ROS2 message
             try:
