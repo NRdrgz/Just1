@@ -109,4 +109,16 @@ def generate_launch_description():
     )
     ld.add_action(state_publisher_node)
 
+    # Camera node
+    camera_node = Node(
+        package="just1_camera",
+        executable="camera_node",
+        name="just1_camera",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
+    )
+    ld.add_action(camera_node)
+
     return ld

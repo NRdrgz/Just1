@@ -6,3 +6,5 @@ empy
 catkin_pkg
 numpy
 lark
+opencv-python
+cv_bridge
