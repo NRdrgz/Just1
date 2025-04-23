@@ -7,6 +7,7 @@ import base64
 import asyncio
 import websockets
 import threading
+import numpy as np
 
 
 class CameraWebSocketBridge(Node):
@@ -29,8 +30,8 @@ class CameraWebSocketBridge(Node):
 
     async def image_callback(self, msg):
         try:
-            # Convert ROS image message to OpenCV
-            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            # Convert ROS image message to OpenCV (in RGB format)
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "rgb8")
             self.get_logger().info(f"Image shape: {cv_image.shape}")
 
             # Validate image shape
@@ -45,13 +46,10 @@ class CameraWebSocketBridge(Node):
 
             cv_image = cv2.resize(cv_image, (target_width, resized_height))
 
-            # Encode the image as JPEG
-            _, jpeg = cv2.imencode(".jpg", cv_image)
-
-            # Convert the encoded image to bytes
-            img_bytes = jpeg.tobytes()
-
-            # Encode the image to base64
+            # Convert RGB image directly to base64
+            # Flatten the array and convert to bytes
+            img_bytes = cv_image.tobytes()
+            # Encode to base64
             b64_data = base64.b64encode(img_bytes).decode("utf-8")
 
             # Send the base64 image to all connected clients
