@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from just1_interface.msg import WheelSpeeds
+from sensor_msgs.msg import Image
 
 
 class RobotStateMonitor(Node):
@@ -9,17 +9,14 @@ class RobotStateMonitor(Node):
 
         # Create subscriber for wheel speeds
         self.subscription = self.create_subscription(
-            WheelSpeeds, "wheel_speeds", self.wheel_speeds_callback, 10
+            Image, "/camera/image_raw", self.camera_callback, 10
         )
 
         self.get_logger().info("Just1 State Monitor initialized")
 
-    def wheel_speeds_callback(self, msg):
-        # Print wheel speeds
-        self.get_logger().info(
-            f"Wheel Speeds - FL: {msg.front_left:.2f}, FR: {msg.front_right:.2f}, "
-            f"BL: {msg.back_left:.2f}, BR: {msg.back_right:.2f}"
-        )
+    def camera_callback(self, msg):
+        # Print camera image
+        self.get_logger().info(f"Camera image received: {msg}")
 
 
 def main(args=None):
