@@ -31,16 +31,19 @@ class CameraWebSocketBridge(Node):
         try:
             # Convert ROS image message to OpenCV
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            self.get_logger().info(f"Image shape: {cv_image.shape}")
 
-            # Ensure the image has valid dimensions
-            if cv_image.shape[1] == 0 or cv_image.shape[0] == 0:
-                self.get_logger().warn("Received image with zero width or height.")
+            # Validate image shape
+            height, width = cv_image.shape[:2]
+            if width <= 0 or height <= 0:
+                self.get_logger().warn("Received image with invalid size.")
                 return
+            # Resize to 500px width while keeping aspect ratio
+            target_width = 500
+            aspect_ratio = height / width
+            resized_height = int(aspect_ratio * target_width)
 
-            # Resize (just resizing width to 500px, keeping aspect ratio)
-            width = 500
-            height = int((cv_image.shape[0] / cv_image.shape[1]) * width)
-            cv_image = cv2.resize(cv_image, (width, height))
+            cv_image = cv2.resize(cv_image, (target_width, resized_height))
 
             # Encode the image as JPEG
             _, jpeg = cv2.imencode(".jpg", cv_image)
