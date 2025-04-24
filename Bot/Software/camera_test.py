@@ -9,7 +9,7 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
 # Allow the camera to warm up
 ret, frame = cap.read()
-
+print(frame.shape)
 if ret:
     # Save the frame as an image
     cv2.imwrite("capture.jpg", frame)
