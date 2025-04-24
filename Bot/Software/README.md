@@ -22,7 +22,7 @@ cd Just1/Bot/Software
 
 4. Install Python dependencies: <br>
 ```bash
-sudo apt install python3-pip python3-gpiozero python3-pygame
+sudo apt install python3-pip python3-gpiozero python3-pygame v4l-utils
 pip install --break-system-packages -r requirements.txt
 ```
 
