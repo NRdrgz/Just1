@@ -3,52 +3,50 @@
 This is a ROS2-based control system for a four-wheeled robot with joystick control.
 
 
-
 ## Installation
-[//]: <> (TODO: add part about Bluetooth controller)
 
+1. Install Ubuntu Server 24.04 on your Pi <br>
+See Reads/How_to_Install_Ubuntu_on_Pi.md <br>
+Once you are connected through SSH to your Pi, continue: <br>
 
-1. Create a virtual env
-   ```bash
-   python -m venv just1-dev
-   source just1-dev/bin/activate 
-   ```
+2. Install ROS2 on your Pi <br>
+See Reads/How_to_Install_ROS2_on_Pi.md <br>
+We are voluntarily not using a virtual environment because it creates issues with the Camera and with ROS2 <br>
 
-2. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+3. Install git and clone this repository on your Pi <br>
+```bash
+sudo apt install git -y
+git clone https://github.com/NRdrgz/Just1.git
+cd Just1/Bot/Software
+```
 
-   Set Python path manually so that ROS can use packages from the venv
-   ```bash
-   export PYTHONPATH=/path/to/your/venv/lib/python3.x/site-packages:$PYTHONPATH
-   ```
-   You can add it to your shell config file for it to be applied at opening
-   ```bash
-   nano ~/.bashrc
-   ```
-   and add the export line at the end
+4. Install Python dependencies: <br>
+```bash
+sudo apt install python3-pip
+pip install -r requirements.txt
+```
 
+5. Connect a Nintendo Lic Pro Controller if you have one <br>
+See Reads/How_to_Connect_Nintendo_Pro_Controller.md <br>
 
-3. Build the packages:
-   ```bash
-   colcon build --symlink-install
-   ```
+6. Build the packages: <br>
+```bash
+colcon build --symlink-install
+```
 
-   To build a single package you can do
-   ```bash
-   colcon build --packages-select <package_name> --symlink-install
-   ```
+To build a single package you can do <br>
+```bash
+colcon build --packages-select <package_name> --symlink-install
+```
 
-
-4. Source the workspace:
-   ```bash
-   source install/setup.bash
-   ```
+7. Source the workspace: <br>
+```bash
+source install/setup.bash
+```
 
 ## Usage
 
-To start the manual control system:
+To start the manual control system: <br>
 
 ```bash
 ros2 launch just1_bringup just1.launch.py mode:=manual

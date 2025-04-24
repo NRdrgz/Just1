@@ -2,10 +2,8 @@ pygame==2.5.2
 gpiozero==2.0
 lgpio==0.2.2.0
 pytest==8.0.0
-empy
-catkin_pkg
-numpy
-lark
-opencv-python
-cv_bridge
-websockets
+empy==4.2
+catkin_pkg==1.0.0
+numpy==2.2.5
+lark==1.2.2
+picamera2==0.3.25
