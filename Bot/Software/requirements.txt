@@ -4,4 +4,3 @@ empy==4.2
 catkin_pkg==1.0.0
 numpy==2.2.5
 lark==1.2.2
-picamera2==0.3.25
