@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-from picamera2 import Picamera2
+import cv2
 import numpy as np
 
 
@@ -16,17 +16,17 @@ class CameraNode(Node):
         # Initialize CV bridge
         self.bridge = CvBridge()
 
-        # Initialize PiCamera2
-        self.picam2 = Picamera2()
+        # Initialize camera using v4l2
+        self.cap = cv2.VideoCapture("/dev/video0", cv2.CAP_V4L2)
+        if not self.cap.isOpened():
+            self.get_logger().error("Could not open camera")
+            raise RuntimeError("Could not open camera")
 
-        # Configure camera
-        config = self.picam2.create_preview_configuration(
-            main={"size": (640, 480), "format": "RGB888"}
-        )
-        self.picam2.configure(config)
-
-        # Start camera
-        self.picam2.start()
+        # Set camera resolution and format
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
+        self.cap.set(cv2.CAP_PROP_FPS, 30)
 
         # Create timer for publishing frames
         self.timer = self.create_timer(0.033, self.timer_callback)  # ~30 FPS
@@ -34,21 +34,25 @@ class CameraNode(Node):
         self.get_logger().info("Camera node initialized")
 
     def timer_callback(self):
-        try:
-            # Capture frame from PiCamera
-            frame = self.picam2.capture_array()
+        ret, frame = self.cap.read()
 
-            # Convert frame to ROS2 message
-            msg = self.bridge.cv2_to_imgmsg(frame, "rgb8")
+        if not ret:
+            self.get_logger().error("Failed to capture frame")
+            return
+        self.get_logger().info(f"Raw frame shape: {frame.shape}, dtype: {frame.dtype}")
+
+        # Convert frame to ROS2 message
+        try:
+            msg = self.bridge.cv2_to_imgmsg(frame, "bgr8")
             self.get_logger().info(f"Publishing frame with shape: {frame.shape}")
 
             self.publisher.publish(msg)
         except Exception as e:
-            self.get_logger().error(f"Error capturing or converting frame: {e}")
+            self.get_logger().error(f"Error converting frame: {e}")
 
     def __del__(self):
-        if hasattr(self, "picam2"):
-            self.picam2.stop()
+        if hasattr(self, "cap"):
+            self.cap.release()
 
 
 def main(args=None):
