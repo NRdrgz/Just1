@@ -88,9 +88,9 @@ def generate_launch_description():
 
     # Manual control nodes
     manual_controller_node = Node(
-        package="just1_manual_controller",
-        executable="controller_node",
-        name="just1_manual_controller",
+        package="just1_motors",
+        executable="manual_controller_node",
+        name="just1_motors",
         output="screen",
         condition=IfCondition(
             PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])

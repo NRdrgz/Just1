@@ -9,10 +9,9 @@
 
   <buildtool_depend>ament_python</buildtool_depend>
   <depend>just1_joystick_driver</depend>
-  <depend>just1_manual_controller</depend>
-  <depend>just1_state_monitor</depend>
-  <depend>just1_utils</depend>
+  <depend>just1_motors</depend>
   <depend>just1_diagnostics</depend>
+  <depend>just1_camera</depend>
 
   <export>
     <build_type>ament_python</build_type>

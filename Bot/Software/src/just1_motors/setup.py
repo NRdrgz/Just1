@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-package_name = "just1_state_monitor"
+package_name = "just1_motors"
 
 setup(
     name=package_name,
@@ -14,12 +14,12 @@ setup(
     zip_safe=True,
     maintainer="Nico",
     maintainer_email="nicolasrdrgzrosdev@protonmail.com",
-    description="Just1 state monitoring used to monitor variable metrics of the robot.",
+    description="Motors for robot movement.",
     license="Apache License 2.0",
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "state_monitor_node = just1_state_monitor.state_monitor_node:main",
+            "manual_controller_node = just1_motors.manual_controller_node:main",
         ],
     },
 )

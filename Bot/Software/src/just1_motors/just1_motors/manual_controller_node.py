@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
 from just1_interface.msg import WheelSpeeds
-from just1_utils.motor_control import setup, stop_all, control_wheel, cleanup
+from utils_motors import setup, stop_all, control_wheel, cleanup
 
 
 class ManualMotorController(Node):
@@ -16,7 +16,7 @@ class ManualMotorController(Node):
     """
 
     def __init__(self):
-        super().__init__("manual_motor_controller")
+        super().__init__("manual_controller_node")
 
         # Initialize GPIO and motors
         setup()

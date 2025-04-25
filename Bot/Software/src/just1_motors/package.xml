@@ -1,11 +1,16 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>just1_utils</name>
+  <name>just1_motors</name>
   <version>0.0.1</version>
-  <description>Common utilities for just1 control</description>
+  <description>Motors for robot movement.</description>
   <maintainer email="nicolasrdrgzrosdev@protonmail.com">Nico</maintainer>
   <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>just1_interface</depend>
 
   <export>
     <build_type>ament_python</build_type>
