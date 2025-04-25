@@ -8,6 +8,7 @@ import websockets
 import threading
 import signal
 import sys
+import os
 
 
 class CameraWebSocketBridge(Node):
@@ -20,6 +21,7 @@ class CameraWebSocketBridge(Node):
         self.loop = None
         self.stop_event = threading.Event()
         self.server = None
+        self._shutdown = False
 
         # Subscribe to camera topic
         self.subscription = self.create_subscription(
@@ -28,13 +30,13 @@ class CameraWebSocketBridge(Node):
 
         # Start the WebSocket server in a separate thread
         self.server_thread = threading.Thread(target=self.start_server)
-        self.server_thread.daemon = (
-            True  # Make thread daemon so it exits when main thread exits
-        )
+        self.server_thread.daemon = True
         self.server_thread.start()
         self.get_logger().info("WebSocket server started")
 
     def listener_callback(self, msg):
+        if self._shutdown:
+            return
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
             # Convert to RGB for web display
@@ -59,43 +61,49 @@ class CameraWebSocketBridge(Node):
 
     def start_server(self):
         async def run():
-            # Start the WebSocket server with binary mode enabled
-            self.server = await websockets.serve(
-                self.send_frames, "0.0.0.0", 8765, compression=None
-            )
-            self.get_logger().info("WebSocket server running at ws://0.0.0.0:8765")
-            self.loop = asyncio.get_event_loop()
             try:
+                # Start the WebSocket server with binary mode enabled
+                self.server = await websockets.serve(
+                    self.send_frames, "0.0.0.0", 8765, compression=None
+                )
+                self.get_logger().info("WebSocket server running at ws://0.0.0.0:8765")
+                self.loop = asyncio.get_event_loop()
+
                 while not self.stop_event.is_set():
                     await asyncio.sleep(0.1)
-            except asyncio.CancelledError:
-                pass
+            except Exception as e:
+                self.get_logger().error(f"WebSocket server error: {e}")
             finally:
                 if self.server:
                     self.server.close()
                     await self.server.wait_closed()
+                if self.loop and self.loop.is_running():
+                    self.loop.stop()
 
-        asyncio.run(run())
+        try:
+            asyncio.run(run())
+        except Exception as e:
+            self.get_logger().error(f"Failed to run WebSocket server: {e}")
 
     def shutdown(self):
         """Clean shutdown of the node and WebSocket server"""
+        self._shutdown = True
         self.stop_event.set()
-        if self.loop and self.loop.is_running():
-            # Create a task to close the server
-            async def close_server():
-                if self.server:
-                    self.server.close()
-                    await self.server.wait_closed()
-                self.loop.stop()
 
-            # Run the close_server task in the event loop
-            asyncio.run_coroutine_threadsafe(close_server(), self.loop)
-
-            # Wait for the server thread to finish
-            if self.server_thread and self.server_thread.is_alive():
-                self.server_thread.join(timeout=2.0)
-
+        # Stop the ROS node first
         self.destroy_node()
+
+        # Then handle the WebSocket server
+        if self.server_thread and self.server_thread.is_alive():
+            # Give the server thread a chance to clean up
+            self.server_thread.join(timeout=1.0)
+
+            # If the thread is still alive, force it to stop
+            if self.server_thread.is_alive():
+                self.get_logger().warn("Forcing WebSocket server thread to stop")
+                if self.loop and self.loop.is_running():
+                    self.loop.call_soon_threadsafe(self.loop.stop)
+                self.server_thread.join(timeout=0.5)
 
 
 def main(args=None):
@@ -103,10 +111,11 @@ def main(args=None):
     node = CameraWebSocketBridge()
 
     def signal_handler(sig, frame):
-        node.get_logger().info("Received shutdown signal")
+        node.get_logger().info(f"Received signal {sig}")
         node.shutdown()
         rclpy.shutdown()
-        sys.exit(0)
+        # Force exit after a short delay to ensure cleanup
+        threading.Timer(1.0, lambda: os._exit(0)).start()
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
