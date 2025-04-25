@@ -19,6 +19,7 @@ class CameraWebSocketBridge(Node):
         self.server_thread = None
         self.loop = None
         self.stop_event = threading.Event()
+        self.server = None
 
         # Subscribe to camera topic
         self.subscription = self.create_subscription(
@@ -59,16 +60,20 @@ class CameraWebSocketBridge(Node):
     def start_server(self):
         async def run():
             # Start the WebSocket server with binary mode enabled
-            async with websockets.serve(
+            self.server = await websockets.serve(
                 self.send_frames, "0.0.0.0", 8765, compression=None
-            ):
-                self.get_logger().info("WebSocket server running at ws://0.0.0.0:8765")
-                self.loop = asyncio.get_event_loop()
-                try:
-                    while not self.stop_event.is_set():
-                        await asyncio.sleep(0.1)
-                except asyncio.CancelledError:
-                    pass
+            )
+            self.get_logger().info("WebSocket server running at ws://0.0.0.0:8765")
+            self.loop = asyncio.get_event_loop()
+            try:
+                while not self.stop_event.is_set():
+                    await asyncio.sleep(0.1)
+            except asyncio.CancelledError:
+                pass
+            finally:
+                if self.server:
+                    self.server.close()
+                    await self.server.wait_closed()
 
         asyncio.run(run())
 
@@ -76,9 +81,20 @@ class CameraWebSocketBridge(Node):
         """Clean shutdown of the node and WebSocket server"""
         self.stop_event.set()
         if self.loop and self.loop.is_running():
-            self.loop.call_soon_threadsafe(self.loop.stop)
-        if self.server_thread and self.server_thread.is_alive():
-            self.server_thread.join(timeout=1.0)
+            # Create a task to close the server
+            async def close_server():
+                if self.server:
+                    self.server.close()
+                    await self.server.wait_closed()
+                self.loop.stop()
+
+            # Run the close_server task in the event loop
+            asyncio.run_coroutine_threadsafe(close_server(), self.loop)
+
+            # Wait for the server thread to finish
+            if self.server_thread and self.server_thread.is_alive():
+                self.server_thread.join(timeout=2.0)
+
         self.destroy_node()
 
 
