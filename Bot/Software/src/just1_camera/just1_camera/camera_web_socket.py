@@ -30,7 +30,8 @@ class CameraWebSocketBridge(Node):
     def listener_callback(self, msg):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-            _, jpeg = cv2.imencode('.jpg', cv_image)
+            rgb_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+            _, jpeg = cv2.imencode('.jpg', rgb_image)
             self.frame = base64.b64encode(jpeg.tobytes()).decode('utf-8')
         except Exception as e:
             self.get_logger().error(f"Failed to convert image: {e}")
@@ -39,7 +40,7 @@ class CameraWebSocketBridge(Node):
         while True:
             if self.frame:
                 await websocket.send(self.frame)
-            await asyncio.sleep(0.033)  # ~30 FPS
+            await asyncio.sleep(0.016)  # ~60 FPS
 
     def start_server(self):
         async def run():

@@ -3,6 +3,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from picamera2 import Picamera2
+import cv2
 
 
 class CameraNode(Node):
@@ -29,7 +30,7 @@ class CameraNode(Node):
         self.picam2.set_controls({"AeEnable": True})
         
         # Create timer for publishing frames
-        self.timer = self.create_timer(0.033, self.timer_callback)  # ~30 FPS
+        self.timer = self.create_timer(0.016, self.timer_callback)  # ~60 FPS
 
         self.get_logger().info("Camera node initialized")
 
@@ -37,6 +38,9 @@ class CameraNode(Node):
         try:
             # Capture frame directly in BGR format
             frame = self.picam2.capture_array()
+
+            # Flip the frame vertically
+            frame = cv2.flip(frame, 0)
             
             # Convert frame to ROS2 message
             msg = self.bridge.cv2_to_imgmsg(frame, "bgr8")
