@@ -35,7 +35,7 @@ class CameraWebSocketBridge(Node):
         except Exception as e:
             self.get_logger().error(f"Failed to convert image: {e}")
 
-    async def send_frames(self, websocket, path):
+    async def send_frames(self, websocket):
         while True:
             if self.frame:
                 await websocket.send(self.frame)
@@ -43,12 +43,8 @@ class CameraWebSocketBridge(Node):
 
     def start_server(self):
         async def run():
-            # Wrap send_frames properly to ensure self is passed
-            async def wrapped_send_frames(websocket, path):
-                return await self.send_frames(websocket, path)
-            
             # Start the WebSocket server when a client connects
-            async with websockets.serve(wrapped_send_frames, '0.0.0.0', 8765):
+            async with websockets.serve(self.send_frames, '0.0.0.0', 8765):
                 self.get_logger().info("WebSocket server running at ws://0.0.0.0:8765")
                 await asyncio.Future()  # Keep it running forever
 
