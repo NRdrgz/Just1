@@ -29,29 +29,16 @@ class CameraWebSocketBridge(Node):
 
     async def image_callback(self, msg):
         try:
-            # Convert ROS image message to OpenCV (in RGB format)
-            cv_image = self.bridge.imgmsg_to_cv2(msg, "rgb8")
-            self.get_logger().info(f"Image shape: {cv_image.shape}")
+            # Convert ROS image message to OpenCV (in BGR format)
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            
+            # Encode image as JPEG
+            _, jpeg_data = cv2.imencode('.jpg', cv_image, [cv2.IMWRITE_JPEG_QUALITY, 80])
+            
+            # Convert to base64
+            b64_data = base64.b64encode(jpeg_data).decode('utf-8')
 
-            # Validate image shape
-            height, width = cv_image.shape[:2]
-            if width <= 0 or height <= 0:
-                self.get_logger().warn("Received image with invalid size.")
-                return
-            # Resize to 500px width while keeping aspect ratio
-            target_width = 500
-            aspect_ratio = height / width
-            resized_height = int(aspect_ratio * target_width)
-
-            cv_image = cv2.resize(cv_image, (target_width, resized_height))
-
-            # Convert RGB image directly to base64
-            # Flatten the array and convert to bytes
-            img_bytes = cv_image.tobytes()
-            # Encode to base64
-            b64_data = base64.b64encode(img_bytes).decode("utf-8")
-
-            # Send the base64 image to all connected clients
+            # Send the base64 JPEG image to all connected clients
             await self.broadcast(b64_data)
 
         except Exception as e:

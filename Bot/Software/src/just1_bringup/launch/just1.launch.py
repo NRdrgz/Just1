@@ -105,7 +105,7 @@ def generate_launch_description():
         name="just1_camera",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'camera'"])
         ),
     )
     ld.add_action(camera_node)
@@ -117,7 +117,7 @@ def generate_launch_description():
         name="just1_camera_web_socket",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'camera'"])
         ),
     )
     ld.add_action(web_socket_bridge_node)
