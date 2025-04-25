@@ -22,15 +22,43 @@ cd Just1/Bot/Software
 
 4. Install Python dependencies: <br>
 ```bash
-sudo apt install python3-pip python3-gpiozero python3-pygame libcap-dev
+sudo apt install python3-pip python3-gpiozero python3-pygame libcap-dev ninja-build libyaml-dev python3-yaml python3-ply python3-jinja2 meson libdrm
 pip install --break-system-packages -r requirements.txt
+```
+5. Build libcamera from source <br>
+As libcamera is not available on Ubuntu Server 24.04 we need to install it from the source
+```bash
+cd ~
+git clone https://git.libcamera.org/libcamera/libcamera.git
+cd libcamera
+meson setup build
+sudo ninja -C build install
+```
+Add the directory to Python search path
+```bash
+echo 'export PYTHONPATH=/usr/local/lib/aarch64-linux-gnu/python3.12/site-packages:$PYTHONPATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
+And we also have to build from source pykms
+```bash
+cd ~
+git clone https://github.com/tomba/kmsxx.git
+cd kmsxx
+meson setup build
+sudo ninja -C build install
+```
+```bash
+echo 'export LD_LIBRARY_PATH=/usr/local/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 5. Connect a Nintendo Lic Pro Controller if you have one <br>
 See Reads/How_to_Connect_Nintendo_Pro_Controller.md <br>
 
-6. Build the packages: <br>
+6. Build the ROS2 packages: <br>
 ```bash
+cd ~/Just1/Bot/Software
 colcon build --symlink-install
 ```
 
