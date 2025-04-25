@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Just1 Live Webapp</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #121212;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+      color: #00ffe5;
+    }
+
+    .camera-container {
+      border: 4px solid #00ffe5;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 255, 229, 0.3);
+    }
+
+    #camera {
+      display: block;
+      width: 640px;
+      height: 480px;
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Just1 Live Feed</h1>
+  <div class="camera-container">
+    <img id="camera" />
+  </div>
+
+  <script>
+    const img = document.getElementById("camera");
+    const ws = new WebSocket("ws://192.168.86.89:8765");
+
+    ws.onmessage = function(event) {
+      img.src = "data:image/jpeg;base64," + event.data;
+    };
+  </script>
+</body>
+</html>
