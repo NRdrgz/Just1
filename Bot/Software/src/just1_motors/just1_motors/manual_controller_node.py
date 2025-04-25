@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
 from just1_interface.msg import WheelSpeeds
-from utils_motors import setup, stop_all, control_wheel, cleanup
+from just1_motors.utils_motors import setup, stop_all, control_wheel, cleanup
 
 
 class ManualMotorController(Node):

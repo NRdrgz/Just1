@@ -18,17 +18,19 @@ class CameraNode(Node):
 
         # Initialize Picamera2
         self.picam2 = Picamera2()
-        
+
         # Configure camera for BGR format
-        config = self.picam2.create_preview_configuration(main={"size": (640, 480), "format": "BGR888"})
+        config = self.picam2.create_preview_configuration(
+            main={"size": (640, 480), "format": "BGR888"}
+        )
         self.picam2.configure(config)
-        
+
         # Start camera
         self.picam2.start()
-        
+
         # Set auto exposure mode
         self.picam2.set_controls({"AeEnable": True})
-        
+
         # Create timer for publishing frames
         self.timer = self.create_timer(0.016, self.timer_callback)  # ~60 FPS
 
@@ -39,9 +41,10 @@ class CameraNode(Node):
             # Capture frame directly in BGR format
             frame = self.picam2.capture_array()
 
-            # Flip the frame vertically
+            # Flip the frame vertically and horizontally
             frame = cv2.flip(frame, 0)
-            
+            frame = cv2.flip(frame, 1)
+
             # Convert frame to ROS2 message
             msg = self.bridge.cv2_to_imgmsg(frame, "bgr8")
 
@@ -59,7 +62,7 @@ class CameraNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = CameraNode()
-    
+
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
