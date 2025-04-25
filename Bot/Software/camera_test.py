@@ -22,7 +22,10 @@ print(image.shape)
 from PIL import Image
 import numpy as np
 
+# First convert numpy array to PIL Image
 image = Image.fromarray(image)
+# Then convert RGBA to RGB
+image = image.convert("RGB")
 image.save("capture.jpg")
 print("Image saved as capture.jpg")
 
