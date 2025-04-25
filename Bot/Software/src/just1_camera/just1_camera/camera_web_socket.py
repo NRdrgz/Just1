@@ -42,12 +42,13 @@ class CameraWebSocketBridge(Node):
             await asyncio.sleep(0.033)  # ~30 FPS
 
     def start_server(self):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        start_server = websockets.serve(self.send_frames, '0.0.0.0', 8765)
-        loop.run_until_complete(start_server)
-        loop.run_forever()
+        async def run():
+            async with websockets.serve(self.send_frames, '0.0.0.0', 8765):
+                self.get_logger().info("WebSocket server running at ws://0.0.0.0:8765")
+                await asyncio.Future()  # Keep it running forever
 
+        asyncio.run(run())
+        
 def main(args=None):
     rclpy.init(args=args)
     node = CameraWebSocketBridge()
