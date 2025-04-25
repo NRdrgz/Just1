@@ -98,4 +98,28 @@ def generate_launch_description():
     )
     ld.add_action(manual_controller_node)
 
+    # Camera node
+    camera_node = Node(
+        package="just1_camera",
+        executable="camera_node",
+        name="just1_camera",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
+    )
+    ld.add_action(camera_node)
+
+    # WebSocket bridge node
+    web_socket_bridge_node = Node(
+        package="just1_camera",
+        executable="camera_web_socket",
+        name="just1_camera_web_socket",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
+    )
+    ld.add_action(web_socket_bridge_node)
+
     return ld

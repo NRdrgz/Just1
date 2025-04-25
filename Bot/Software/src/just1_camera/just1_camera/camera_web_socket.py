@@ -7,7 +7,6 @@ import base64
 import asyncio
 import websockets
 import threading
-import numpy as np
 
 
 class CameraWebSocketBridge(Node):
