@@ -53,10 +53,10 @@ echo 'export LD_LIBRARY_PATH=/usr/local/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH' 
 source ~/.bashrc
 ```
 
-5. Connect a Nintendo Lic Pro Controller if you have one <br>
+6. Connect a Nintendo Lic Pro Controller if you have one <br>
 See Reads/How_to_Connect_Nintendo_Pro_Controller.md <br>
 
-6. Build the ROS2 packages: <br>
+7. Build the ROS2 packages: <br>
 ```bash
 cd ~/Just1/Bot/Software
 colcon build --symlink-install
@@ -67,7 +67,7 @@ To build a single package you can do <br>
 colcon build --packages-select <package_name> --symlink-install
 ```
 
-7. Source the workspace: <br>
+8. Source the workspace: <br>
 ```bash
 source install/setup.bash
 ```
