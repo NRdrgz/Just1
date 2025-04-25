@@ -83,6 +83,9 @@ def generate_launch_description():
         executable="joystick_node",
         name="just1_joystick_driver",
         output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
     ld.add_action(joystick_node)
 

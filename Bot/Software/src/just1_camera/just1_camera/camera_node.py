@@ -38,11 +38,8 @@ class CameraNode(Node):
             # Capture frame directly in BGR format
             frame = self.picam2.capture_array()
             
-            self.get_logger().info(f"Raw frame shape: {frame.shape}, dtype: {frame.dtype}")
-
             # Convert frame to ROS2 message
             msg = self.bridge.cv2_to_imgmsg(frame, "bgr8")
-            self.get_logger().info(f"Publishing frame with shape: {frame.shape}")
 
             self.publisher.publish(msg)
         except Exception as e:
