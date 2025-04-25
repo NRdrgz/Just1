@@ -45,7 +45,8 @@ class CameraNode(Node):
         except Exception as e:
             self.get_logger().error(f"Error capturing or converting frame: {e}")
 
-    def __del__(self):
+    def cleanup(self):
+        """Cleanup resources"""
         if hasattr(self, "picam2"):
             self.picam2.stop()
             self.picam2.close()
@@ -54,13 +55,13 @@ class CameraNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = CameraNode()
-
+    
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        node.destroy_node()
-        rclpy.shutdown()
+        pass
     finally:
+        node.cleanup()
         node.destroy_node()
         rclpy.shutdown()
 
