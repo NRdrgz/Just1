@@ -9,6 +9,7 @@ class JoystickDriver(Node):
         super().__init__("joystick_driver")
 
         # Initialize pygame for joystick support
+        pygame.display.init()
         pygame.joystick.init()
 
         # Check if any joysticks are connected
