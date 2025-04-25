@@ -22,6 +22,7 @@ class CameraWebSocketBridge(Node):
 
         # Start WebSocket server in a separate thread
         self.server_thread = threading.Thread(target=self.run_ws_server)
+        self.server_thread.daemon = True
         self.server_thread.start()
 
         # Create a list to hold connected clients
@@ -64,10 +65,14 @@ class CameraWebSocketBridge(Node):
             self.connected_clients.remove(websocket)
 
     def run_ws_server(self):
+        # Create a new event loop for this thread
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
+        # Create the server
         start_server = websockets.serve(self.websocket_handler, "0.0.0.0", 8765)
+        
+        # Run the server
         loop.run_until_complete(start_server)
         loop.run_forever()
 
