@@ -18,6 +18,13 @@ time.sleep(2)
 image = picam2.capture_array()
 print(image.shape)
 
+# Save the image
+from PIL import Image
+import numpy as np
+
+image = Image.fromarray(image)
+image.save("capture.jpg")
+print("Image saved as capture.jpg")
 
 # Stop the camera
 picam2.stop()
