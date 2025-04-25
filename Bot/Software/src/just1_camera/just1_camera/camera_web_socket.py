@@ -6,20 +6,19 @@ import cv2
 import asyncio
 import websockets
 import threading
-import base64
+import numpy as np
+
 
 class CameraWebSocketBridge(Node):
     def __init__(self):
-        super().__init__('camera_web_socket')
+        super().__init__("camera_web_socket")
         self.bridge = CvBridge()
         self.frame = None
+        self.jpeg_quality = 85  # JPEG quality (0-100)
 
         # Subscribe to camera topic
         self.subscription = self.create_subscription(
-            Image,
-            'camera/image_raw',
-            self.listener_callback,
-            10
+            Image, "camera/image_raw", self.listener_callback, 10
         )
 
         # Start the WebSocket server in a separate thread
@@ -29,10 +28,15 @@ class CameraWebSocketBridge(Node):
 
     def listener_callback(self, msg):
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+            # Convert to RGB for web display
             rgb_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
-            _, jpeg = cv2.imencode('.jpg', rgb_image)
-            self.frame = base64.b64encode(jpeg.tobytes()).decode('utf-8')
+            # Encode to JPEG with specified quality
+            _, jpeg = cv2.imencode(
+                ".jpg", rgb_image, [cv2.IMWRITE_JPEG_QUALITY, self.jpeg_quality]
+            )
+            # Store as binary data instead of base64
+            self.frame = jpeg.tobytes()
         except Exception as e:
             self.get_logger().error(f"Failed to convert image: {e}")
 
@@ -40,17 +44,20 @@ class CameraWebSocketBridge(Node):
         while True:
             if self.frame:
                 await websocket.send(self.frame)
-            await asyncio.sleep(0.016)  # ~60 FPS
+            await asyncio.sleep(0.033)  # Match camera FPS
 
     def start_server(self):
         async def run():
-            # Start the WebSocket server when a client connects
-            async with websockets.serve(self.send_frames, '0.0.0.0', 8765):
+            # Start the WebSocket server with binary mode enabled
+            async with websockets.serve(
+                self.send_frames, "0.0.0.0", 8765, compression=None
+            ):
                 self.get_logger().info("WebSocket server running at ws://0.0.0.0:8765")
                 await asyncio.Future()  # Keep it running forever
 
         asyncio.run(run())
-        
+
+
 def main(args=None):
     rclpy.init(args=args)
     node = CameraWebSocketBridge()
@@ -63,5 +70,6 @@ def main(args=None):
         node.destroy_node()
         rclpy.shutdown()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

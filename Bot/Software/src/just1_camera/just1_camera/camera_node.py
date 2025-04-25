@@ -19,20 +19,35 @@ class CameraNode(Node):
         # Initialize Picamera2
         self.picam2 = Picamera2()
 
-        # Configure camera for BGR format
+        # Configure camera for optimized performance
         config = self.picam2.create_preview_configuration(
-            main={"size": (640, 480), "format": "BGR888"}
+            main={
+                "size": (640, 480),
+                "format": "BGR888",
+                "buffer_count": 2,  # Reduced buffer count for lower latency
+            }
         )
         self.picam2.configure(config)
 
         # Start camera
         self.picam2.start()
 
-        # Set auto exposure mode
-        self.picam2.set_controls({"AeEnable": True})
+        # Optimize camera controls
+        self.picam2.set_controls(
+            {
+                "AeEnable": True,
+                "FrameDurationLimits": (
+                    33333,
+                    33333,
+                ),  # 30 FPS for more consistent timing
+                "NoiseReductionMode": 0,  # Disable noise reduction for lower latency
+            }
+        )
 
         # Create timer for publishing frames
-        self.timer = self.create_timer(0.016, self.timer_callback)  # ~60 FPS
+        self.timer = self.create_timer(
+            0.033, self.timer_callback
+        )  # 30 FPS for more consistent timing
 
         self.get_logger().info("Camera node initialized")
 
