@@ -43,7 +43,12 @@ class CameraWebSocketBridge(Node):
 
     def start_server(self):
         async def run():
-            async with websockets.serve(lambda ws, path: self.send_frames(ws, path), '0.0.0.0', 8765):
+            # Wrap send_frames properly to ensure self is passed
+            async def wrapped_send_frames(websocket, path):
+                return await self.send_frames(websocket, path)
+            
+            # Start the WebSocket server when a client connects
+            async with websockets.serve(wrapped_send_frames, '0.0.0.0', 8765):
                 self.get_logger().info("WebSocket server running at ws://0.0.0.0:8765")
                 await asyncio.Future()  # Keep it running forever
 
