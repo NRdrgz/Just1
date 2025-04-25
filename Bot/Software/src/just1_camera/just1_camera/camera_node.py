@@ -21,11 +21,7 @@ class CameraNode(Node):
 
         # Configure camera for optimized performance
         config = self.picam2.create_preview_configuration(
-            main={
-                "size": (640, 480),
-                "format": "BGR888",
-                "buffer_count": 2,  # Reduced buffer count for lower latency
-            }
+            main={"size": (640, 480), "format": "BGR888"}
         )
         self.picam2.configure(config)
 
