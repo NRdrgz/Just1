@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -39,6 +40,7 @@
     }
   </style>
 </head>
+
 <body>
   <h1>Just1 Live Feed</h1>
   <div class="camera-container">
@@ -49,9 +51,22 @@
     const img = document.getElementById("camera");
     const ws = new WebSocket("ws://192.168.86.89:8765");
 
-    ws.onmessage = function(event) {
-      img.src = "data:image/jpeg;base64," + event.data;
+    // Set binary type to 'blob' to receive binary data
+    ws.binaryType = 'blob';
+
+    ws.onmessage = function (event) {
+      // Create a URL from the binary blob
+      const blob = new Blob([event.data], { type: 'image/jpeg' });
+      const url = URL.createObjectURL(blob);
+      img.src = url;
+
+      // Clean up the previous URL to prevent memory leaks
+      if (img.previousUrl) {
+        URL.revokeObjectURL(img.previousUrl);
+      }
+      img.previousUrl = url;
     };
   </script>
 </body>
+
 </html>
