@@ -6,7 +6,8 @@ import cv2
 import asyncio
 import websockets
 import threading
-import numpy as np
+import signal
+import sys
 
 
 class CameraWebSocketBridge(Node):
@@ -15,6 +16,9 @@ class CameraWebSocketBridge(Node):
         self.bridge = CvBridge()
         self.frame = None
         self.jpeg_quality = 85  # JPEG quality (0-100)
+        self.server_thread = None
+        self.loop = None
+        self.stop_event = threading.Event()
 
         # Subscribe to camera topic
         self.subscription = self.create_subscription(
@@ -23,6 +27,9 @@ class CameraWebSocketBridge(Node):
 
         # Start the WebSocket server in a separate thread
         self.server_thread = threading.Thread(target=self.start_server)
+        self.server_thread.daemon = (
+            True  # Make thread daemon so it exits when main thread exits
+        )
         self.server_thread.start()
         self.get_logger().info("WebSocket server started")
 
@@ -41,9 +48,12 @@ class CameraWebSocketBridge(Node):
             self.get_logger().error(f"Failed to convert image: {e}")
 
     async def send_frames(self, websocket):
-        while True:
+        while not self.stop_event.is_set():
             if self.frame:
-                await websocket.send(self.frame)
+                try:
+                    await websocket.send(self.frame)
+                except websockets.exceptions.ConnectionClosed:
+                    break
             await asyncio.sleep(0.033)  # Match camera FPS
 
     def start_server(self):
@@ -53,21 +63,44 @@ class CameraWebSocketBridge(Node):
                 self.send_frames, "0.0.0.0", 8765, compression=None
             ):
                 self.get_logger().info("WebSocket server running at ws://0.0.0.0:8765")
-                await asyncio.Future()  # Keep it running forever
+                self.loop = asyncio.get_event_loop()
+                try:
+                    while not self.stop_event.is_set():
+                        await asyncio.sleep(0.1)
+                except asyncio.CancelledError:
+                    pass
 
         asyncio.run(run())
+
+    def shutdown(self):
+        """Clean shutdown of the node and WebSocket server"""
+        self.stop_event.set()
+        if self.loop and self.loop.is_running():
+            self.loop.call_soon_threadsafe(self.loop.stop)
+        if self.server_thread and self.server_thread.is_alive():
+            self.server_thread.join(timeout=1.0)
+        self.destroy_node()
 
 
 def main(args=None):
     rclpy.init(args=args)
     node = CameraWebSocketBridge()
 
+    def signal_handler(sig, frame):
+        node.get_logger().info("Received shutdown signal")
+        node.shutdown()
+        rclpy.shutdown()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
     finally:
-        node.destroy_node()
+        node.shutdown()
 
 
 if __name__ == "__main__":

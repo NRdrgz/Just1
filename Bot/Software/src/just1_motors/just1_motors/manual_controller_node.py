@@ -159,11 +159,6 @@ class ManualMotorController(Node):
 
         return speeds
 
-    def __del__(self):
-        """Cleanup when node is destroyed"""
-        stop_all()
-        cleanup()
-
 
 def main(args=None):
     rclpy.init(args=args)
@@ -174,6 +169,9 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        # Stop all motors and cleanup GPIO before destroying the node
+        stop_all()
+        cleanup()
         node.destroy_node()
 
 
