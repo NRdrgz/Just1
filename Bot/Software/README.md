@@ -6,11 +6,11 @@ This is a ROS2-based control system for a four-wheeled robot with joystick contr
 ## Installation
 
 1. Install Ubuntu Server 24.04 on your Pi <br>
-See Reads/How_to_Install_Ubuntu_on_Pi.md <br>
+See `Reads/How_to_Install_Ubuntu_on_Pi.md` <br>
 Once you are connected through SSH to your Pi, continue: <br>
 
 2. Install ROS2 on your Pi <br>
-See Reads/How_to_Install_ROS2_on_Pi.md <br>
+See `Reads/How_to_Install_ROS2_on_Pi.md` <br>
 We are voluntarily not using a virtual environment because it creates issues with the Camera and with ROS2 <br>
 
 3. Install git and clone this repository on your Pi <br>
@@ -54,7 +54,7 @@ source ~/.bashrc
 ```
 
 6. Connect a Nintendo Lic Pro Controller if you have one <br>
-See Reads/How_to_Connect_Nintendo_Pro_Controller.md <br>
+See `Reads/How_to_Connect_Nintendo_Pro_Controller.md` <br>
 
 7. Build the ROS2 packages: <br>
 ```bash
