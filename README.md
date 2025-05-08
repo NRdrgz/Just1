@@ -33,19 +33,23 @@ Located in `/Bot/Software`:
 
 ## Features in Progress
 
-- Autonomous navigation using ROS2 VSLAM
+- Autonomous navigation using ROS2 VSLAM (RTAB Map)
 - Add documentation on Camera feedback through websocket
 
 ## Short-term To-Do List
 
 - Create detailed README for Hardware folder
 - Add assembly and wiring documentation
+- Add control and camera feedback on phone
 
 ## Long-term Goals and Potential Improvements
 
 - Add a Docker Image for easier and faster deployment
+- Perform Navigation through Neural Network architecture instead of VSLAM 
 - Replace AA batteries with voltage booster for simplified power management
-- Integrate LIDAR system for advanced navigation and experimentation
+- Integrate LIDAR system, IMU and/or wheel encoders for advanced navigation and experimentation
+- Integrate Analytics solution such as Foxglove Studio to experiment with it 
+- Integrate memory / latency profilers to optimize processes and detect memory leaks
 
 
 

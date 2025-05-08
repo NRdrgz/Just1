@@ -122,4 +122,14 @@ def generate_launch_description():
     )
     ld.add_action(web_socket_bridge_node)
 
+    # Foxglove Bridge node. This node is installed through sudo apt install ros-jazzy-foxglove-bridge
+    foxglove_bridge_node = Node(
+        package="foxglove_bridge",  
+        executable="foxglove_bridge",  
+        name="foxglove_bridge",  
+        output="screen",
+        parameters=[{'port': '8765'}],
+    )
+    ld.add_action(foxglove_bridge_node)
+
     return ld

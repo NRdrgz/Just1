@@ -1,5 +1,5 @@
 # Installing ROS2 on Ubuntu
-Following tutorial here https://docs.ros.org/en/humble/Installation/Alternatives/Ubuntu-Development-Setup.html
+Following tutorial here https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html
 
 ## Check locale support UTF-8
 ```bash
