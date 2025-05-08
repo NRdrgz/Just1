@@ -128,7 +128,7 @@ def generate_launch_description():
         executable="foxglove_bridge",  
         name="foxglove_bridge",  
         output="screen",
-        parameters=[{'port': '8765'}],
+        parameters=[{'port': 8765}],
     )
     ld.add_action(foxglove_bridge_node)
 
