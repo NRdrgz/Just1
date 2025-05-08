@@ -34,6 +34,7 @@ Located in `/Bot/Software`:
 ## Features in Progress
 
 - Autonomous navigation using ROS2 VSLAM
+- Add documentation on Camera feedback through websocket
 
 ## Short-term To-Do List
 
@@ -42,6 +43,7 @@ Located in `/Bot/Software`:
 
 ## Long-term Goals and Potential Improvements
 
+- Add a Docker Image for easier and faster deployment
 - Replace AA batteries with voltage booster for simplified power management
 - Integrate LIDAR system for advanced navigation and experimentation
 

@@ -1,9 +1,9 @@
-lgpio==0.2.2.0
-pytest==8.0.0
-empy==4.2
+lgpio==0.2.0.0
+pytest==7.4.4
+empy==3.3.4
 catkin_pkg==1.0.0
-numpy==2.2.5
-lark==1.2.2
+numpy==1.26.4
+lark==1.1.9
 picamera2==0.3.25
-cv-bridge
-websockets
+cv-bridge==1.13.0.post0
+websockets==15.0.1
