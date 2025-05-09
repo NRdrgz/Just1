@@ -115,7 +115,7 @@ def generate_launch_description():
 
     # WebSocket bridge node
     # Deactivated for now as using Foxglove Bridge node instead
-    
+
     # web_socket_bridge_node = Node(
     #     package="just1_camera",
     #     executable="camera_web_socket",
@@ -145,7 +145,7 @@ def generate_launch_description():
         executable="foxglove_bridge",  
         name="foxglove_bridge",  
         output="screen",
-        parameters=[{'port': 8765, 'topic_whitelist': ['/camera/video_compressed']}],
+        parameters=[{'port': 8765, 'topic_whitelist': ['/camera/image_compressed']}],
     )
     ld.add_action(foxglove_bridge_node)
 
