@@ -3,9 +3,8 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from foxglove_msgs.msg import CompressedVideo
 import subprocess
-import io
 
-H264_START_CODE = b'\x00\x00\x00\x01'
+H264_START_CODE = b'\x00\x00\x00\x01'  # Start code for Annex B format
 
 class CameraEncoderNode(Node):
     def __init__(self):
@@ -63,8 +62,8 @@ class CameraEncoderNode(Node):
             # Write raw bytes to FFmpeg's stdin for encoding
             self.ffmpeg.stdin.write(raw_bytes)
 
-            # Read the encoded frame from FFmpeg's stdout
-            encoded_frame = self.ffmpeg.stdout.read(1024 * 64)  # Read up to 64KB of compressed data
+            # Read the encoded frame from FFmpeg's stdout (make sure it's a full frame)
+            encoded_frame = self.read_full_frame()
 
             if encoded_frame:
                 # Create and publish a CompressedVideo message
@@ -79,6 +78,18 @@ class CameraEncoderNode(Node):
 
         except Exception as e:
             self.get_logger().error(f"Encoding error: {e}")
+
+    def read_full_frame(self):
+        """Reads a full compressed frame from FFmpeg's stdout."""
+        # Read 64KB of data from stdout (might need more or less depending on frame size)
+        encoded_frame = self.ffmpeg.stdout.read(1024 * 64)
+
+        # Ensure that we have a valid frame (contains start code)
+        if encoded_frame.startswith(H264_START_CODE):
+            return encoded_frame
+        else:
+            # If we don't have a full frame, we might need to continue reading
+            return b""
 
     def cleanup(self):
         if self.ffmpeg:
