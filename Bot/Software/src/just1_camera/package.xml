@@ -12,6 +12,8 @@
   <depend>sensor_msgs</depend>
   <depend>cv_bridge</depend>
   <depend>opencv-python</depend>
+  <depend>picamera2</depend>
+  <depend>foxglove_msgs</depend>
 
 
   <export>

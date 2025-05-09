@@ -123,13 +123,24 @@ def generate_launch_description():
     # )
     # ld.add_action(web_socket_bridge_node)
 
+    # Camera encoder node
+    camera_encoder_node = Node(
+        package="just1_camera",
+        executable="camera_encoder_node",
+        name="just1_camera_encoder",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
+    )
+
     # Foxglove Bridge node. This node is installed through sudo apt install ros-jazzy-foxglove-bridge
     foxglove_bridge_node = Node(
         package="foxglove_bridge",  
         executable="foxglove_bridge",  
         name="foxglove_bridge",  
         output="screen",
-        parameters=[{'port': 8765, 'send_buffer_limit': 100000000, 'use_compression': True, 'topic_whitelist': ['/joy', '/wheel_speeds', '/camera/image_raw']}],
+        parameters=[{'port': 8765, 'topic_whitelist': ['/joy', '/wheel_speeds', '/camera/video_compressed']}],
     )
     ld.add_action(foxglove_bridge_node)
 

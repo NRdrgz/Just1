@@ -21,6 +21,7 @@ setup(
         "console_scripts": [
             "camera_node = just1_camera.camera_node:main",
             "camera_web_socket = just1_camera.camera_web_socket:main",
+            "camera_encoder_node = just1_camera.camera_encoder_node:main",
         ],
     },
 )
