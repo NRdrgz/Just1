@@ -56,7 +56,7 @@ class CameraEncoderNode(Node):
                 out_msg.timestamp = msg.header.stamp
                 out_msg.frame_id = msg.header.frame_id
                 out_msg.format = "h264"
-                out_msg.data = packet.data
+                out_msg.data = packet
                 self.publisher.publish(out_msg)
 
         except Exception as e:
