@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from foxglove_msgs.msg import CompressedVideo
-import subprocess
+import ffmpeg
 
 H264_START_CODE = b'\x00\x00\x00\x01'  # Start code for Annex B format
 
@@ -23,35 +23,30 @@ class CameraEncoderNode(Node):
         self.height = 480  # Assuming image height
         self.fps = 30  # Assuming frame rate
 
-        # Start FFmpeg subprocess for H.264 encoding
-        self.ffmpeg = self.start_ffmpeg()
+        # Initialize FFmpeg process
+        self.process = None
+        self.setup_ffmpeg()
 
         self.get_logger().info("Camera encoder node initialized")
-       
 
-    def start_ffmpeg(self):
-        # FFmpeg command to encode raw video to H.264 in Annex B format
-        cmd = [
-            'ffmpeg',
-            '-loglevel', 'quiet',  # Disable FFmpeg logs
-            '-f', 'rawvideo',
-            '-pixel_format', 'bgr24',  # Input format: 24-bit BGR
-            '-video_size', f'{self.width}x{self.height}',  # Image resolution
-            '-framerate', str(self.fps),  # Frame rate
-            '-i', '-',  # Input comes from stdin
-            '-c:v', 'libx264',  # Use H.264 codec
-            '-preset', 'ultrafast',  # Fastest encoding (low latency)
-            '-tune', 'zerolatency',  # Low-latency encoding
-            '-x264-params', 'repeat-headers=1:keyint=30',  # Ensure SPS/PPS before each keyframe
-            '-f', 'h264',  # Output format: H.264 in Annex B
-            '-'  # Output to stdout (FFmpeg will send encoded frames here)
-        ]
-
-        return subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    def setup_ffmpeg(self):
+        try:
+            # Configure FFmpeg process
+            self.process = (
+                ffmpeg
+                .input('pipe:', format='rawvideo', pix_fmt='bgr24', s=f'{self.width}x{self.height}', r=self.fps)
+                .output('pipe:', format='h264', vcodec='libx264', preset='ultrafast', tune='zerolatency',
+                       x264opts='repeat-headers=1:keyint=30')
+                .overwrite_output()
+                .run_async(pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
+            )
+        except ffmpeg.Error as e:
+            self.get_logger().error(f"Failed to initialize FFmpeg: {e.stderr.decode() if e.stderr else str(e)}")
+            raise
 
     def image_callback(self, msg: Image):
         try:
-            # Ensure the image is in bgr8 encoding and the raw bytes are accessible
+            # Ensure the image is in bgr8 encoding
             if msg.encoding != 'bgr8':
                 self.get_logger().error(f"Unsupported encoding: {msg.encoding}")
                 return
@@ -60,14 +55,9 @@ class CameraEncoderNode(Node):
             raw_bytes = bytes(msg.data)
 
             # Write raw bytes to FFmpeg's stdin for encoding
-            self.ffmpeg.stdin.write(raw_bytes)
+            self.process.stdin.write(raw_bytes)
 
-            # Check if there's any error output from FFmpeg
-            err_output = self.ffmpeg.stderr.read()
-            if err_output:
-                self.get_logger().warn(f"FFmpeg stderr: {err_output.decode('utf-8')}")
-
-            # Read the encoded frame from FFmpeg's stdout (make sure it's a full frame)
+            # Read encoded frame
             encoded_frame = self.read_full_frame()
 
             if encoded_frame:
@@ -75,7 +65,7 @@ class CameraEncoderNode(Node):
                 video_msg = CompressedVideo()
                 video_msg.timestamp = msg.header.stamp
                 video_msg.frame_id = msg.header.frame_id
-                video_msg.data = list(encoded_frame)  # Convert the bytes to list of integers
+                video_msg.data = list(encoded_frame)
                 video_msg.format = 'h264'
 
                 # Publish the compressed video message
@@ -86,23 +76,25 @@ class CameraEncoderNode(Node):
 
     def read_full_frame(self):
         """Reads a full compressed frame from FFmpeg's stdout."""
-        # Read 64KB of data from stdout (might need more or less depending on frame size)
-        encoded_frame = self.ffmpeg.stdout.read(1024 * 64)
+        try:
+            # Read 64KB of data from stdout
+            encoded_frame = self.process.stdout.read(1024 * 64)
 
-        # Ensure that we have a valid frame (contains start code)
-        if encoded_frame.startswith(H264_START_CODE):
-            return encoded_frame
-        else:
-            # If we don't have a full frame, we might need to continue reading
+            # Ensure that we have a valid frame (contains start code)
+            if encoded_frame and encoded_frame.startswith(H264_START_CODE):
+                return encoded_frame
+            return b""
+        except Exception as e:
+            self.get_logger().error(f"Error reading frame: {e}")
             return b""
 
     def cleanup(self):
-        if self.ffmpeg:
+        if self.process:
             try:
-                if self.ffmpeg.stdin:
-                    self.ffmpeg.stdin.close()
-                self.ffmpeg.terminate()
-                self.encoder.wait(timeout=2)
+                self.process.stdin.close()
+                self.process.stdout.close()
+                self.process.stderr.close()
+                self.process.wait(timeout=2)
             except Exception as e:
                 self.get_logger().warn(f"Error during encoder shutdown: {e}")
 
