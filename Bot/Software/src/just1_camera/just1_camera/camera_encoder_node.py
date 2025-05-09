@@ -4,7 +4,7 @@ from sensor_msgs.msg import Image
 from foxglove_msgs.msg import CompressedVideo
 
 import subprocess
-import re
+from cv_bridge import CvBridge
 
 class CameraEncoderNode(Node):
     def __init__(self):
@@ -25,6 +25,7 @@ class CameraEncoderNode(Node):
         self.width = 640
         self.height = 480
         self.fps = 30
+        self.bridge = CvBridge()
 
         # Start persistent ffmpeg process
         self.ffmpeg_process = self.start_ffmpeg()
@@ -69,8 +70,11 @@ class CameraEncoderNode(Node):
                 self.get_logger().error(f"FFmpeg crashed:\n{err}")
                 return
 
-            # Feed frame to FFmpeg
-            self.ffmpeg_process.stdin.write(msg.data)
+            # Convert the incoming ROS image message to OpenCV format (BGR8)
+            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+
+            # Write the image data to ffmpeg's stdin
+            self.ffmpeg_process.stdin.write(cv_image.tobytes())
             
             # Now read the output from ffmpeg (raw H.264)
             nal_unit_data = b""
