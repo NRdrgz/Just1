@@ -71,9 +71,9 @@ class CameraEncoderNode(Node):
             # Feed frame to FFmpeg
             self.ffmpeg_process.stdin.write(msg.data)
 
-            # Read and publish exactly one encoded H264 frame
+            # Read and publish H264 frame
             # This is required by Foxglove: https://docs.foxglove.dev/docs/visualization/message-schemas/compressed-video
-            frame = self.read_one_annexb_frame()
+            frame = self.ffmpeg_process.stdout.read(1024)
             if frame:
                 out_msg = CompressedVideo()
                 out_msg.timestamp = msg.header.stamp
@@ -85,25 +85,6 @@ class CameraEncoderNode(Node):
         except Exception as e:
             self.get_logger().error(f"Encoding failed: {e}")
 
-    def read_one_annexb_frame(self):
-        start_code = b'\x00\x00\x00\x01'
-        self.read_buffer.extend(self.ffmpeg_process.stdout.read(4096))
-
-        # Find NAL unit boundaries
-        start_indices = []
-        idx = self.read_buffer.find(start_code)
-        while idx != -1:
-            start_indices.append(idx)
-            idx = self.read_buffer.find(start_code, idx + 4)
-
-        # Need at least two NALs to find frame boundaries
-        if len(start_indices) >= 2:
-            frame_end = start_indices[1]
-            frame = self.read_buffer[:frame_end]
-            self.read_buffer = self.read_buffer[frame_end:]
-            return bytes(frame)
-
-        return None
 
     def cleanup(self):
         if self.ffmpeg_process:
