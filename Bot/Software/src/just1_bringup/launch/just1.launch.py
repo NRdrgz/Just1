@@ -10,9 +10,9 @@ def generate_launch_description():
     # Create launch description
     ld = LaunchDescription()
 
-    ################ 
+    ################
     # Add arguments for mode selection
-    ################ 
+    ################
 
     mode_arg = DeclareLaunchArgument(
         "mode",
@@ -21,9 +21,9 @@ def generate_launch_description():
     )
     ld.add_action(mode_arg)
 
-    ################ 
+    ################
     # Add arguments for diagnostics
-    ################ 
+    ################
 
     # To test wheel, run:
     # ros2 launch just1_bringup just1.launch.py mode:=diagnostics test_wheel:=front_left
@@ -89,7 +89,15 @@ def generate_launch_description():
         name="just1_joystick_driver",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual' or '", LaunchConfiguration("mode"), "' == 'diagnostics'"])
+            PythonExpression(
+                [
+                    "'",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual' or '",
+                    LaunchConfiguration("mode"),
+                    "' == 'diagnostics'",
+                ]
+            )
         ),
     )
     ld.add_action(joystick_node)
@@ -146,11 +154,16 @@ def generate_launch_description():
 
     # Foxglove Bridge node. This node is installed through sudo apt install ros-jazzy-foxglove-bridge
     foxglove_bridge_node = Node(
-        package="foxglove_bridge",  
-        executable="foxglove_bridge",  
-        name="foxglove_bridge",  
+        package="foxglove_bridge",
+        executable="foxglove_bridge",
+        name="foxglove_bridge",
         output="screen",
-        parameters=[{'port': 8765, 'topic_whitelist': ['/wheel_speeds', '/camera/image_compressed']}],
+        parameters=[
+            {
+                "port": 8765,
+                "topic_whitelist": ["/wheel_speeds", "/camera/image_compressed"],
+            }
+        ],
         condition=IfCondition(
             PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
         ),

@@ -39,15 +39,13 @@ class CameraNode(Node):
                 "FrameDurationLimits": (
                     int((1 / self.fps) * 1000000),
                     int((1 / self.fps) * 1000000),
-                ),  
+                ),
                 "NoiseReductionMode": 0,  # Disable noise reduction for lower latency
             }
         )
 
         # Create timer for publishing frames
-        self.timer = self.create_timer(
-            1 / self.fps, self.timer_callback
-        )  
+        self.timer = self.create_timer(1 / self.fps, self.timer_callback)
         self.get_logger().info("Camera node initialized")
 
     def timer_callback(self):
