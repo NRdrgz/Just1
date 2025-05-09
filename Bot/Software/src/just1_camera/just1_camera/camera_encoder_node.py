@@ -3,7 +3,6 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from foxglove_msgs.msg import CompressedVideo
 
-import ffmpeg
 import subprocess
 
 
@@ -26,7 +25,6 @@ class CameraEncoderNode(Node):
         self.width = 640
         self.height = 480
         self.fps = 30
-        self.read_buffer = bytearray()
 
         # Start persistent ffmpeg process
         self.ffmpeg_process = self.start_ffmpeg()
@@ -54,26 +52,14 @@ class CameraEncoderNode(Node):
 
     def image_callback(self, msg: Image):
         try:
-            if msg.encoding != 'bgr8':
-                self.get_logger().error(f"Unsupported image encoding: {msg.encoding}")
-                return
-
-            expected_size = self.width * self.height * 3
-            if len(msg.data) != expected_size:
-                self.get_logger().error(f"Unexpected image size: {len(msg.data)} != {expected_size}")
-                return
-            
-            if self.ffmpeg_process.poll() is not None:
-                err = self.ffmpeg_process.stderr.read().decode()
-                self.get_logger().error(f"FFmpeg crashed:\n{err}")
-                return
-
             # Feed frame to FFmpeg
             self.ffmpeg_process.stdin.write(msg.data)
+            
 
             # Read and publish H264 frame
             # This is required by Foxglove: https://docs.foxglove.dev/docs/visualization/message-schemas/compressed-video
             frame = self.ffmpeg_process.stdout.read(1024)
+            print(frame)
             if frame:
                 out_msg = CompressedVideo()
                 out_msg.timestamp = msg.header.stamp
