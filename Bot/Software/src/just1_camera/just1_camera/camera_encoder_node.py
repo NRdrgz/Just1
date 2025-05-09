@@ -42,6 +42,8 @@ class CameraEncoderNode(Node):
         # Create timer for publishing frames at 30 Hz
         self.timer = self.create_timer(0.033, self.timer_callback)
 
+        self.get_logger().info("Camera encoder node initialized")
+
     def timer_callback(self):
         frame = self.picam2.capture_array()
         frame = cv2.flip(frame, 0)
