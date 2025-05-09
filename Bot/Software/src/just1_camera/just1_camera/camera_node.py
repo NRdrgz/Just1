@@ -10,8 +10,8 @@ class CameraNode(Node):
     def __init__(self):
         super().__init__("camera_node")
 
-        self.width = 1920
-        self.height = 1080
+        self.width = 640
+        self.height = 480
         self.fps = 30
 
         # Create publisher for the camera feed
