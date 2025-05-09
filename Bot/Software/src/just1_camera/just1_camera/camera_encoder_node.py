@@ -32,22 +32,24 @@ class CameraEncoderNode(Node):
         self.get_logger().info("Camera encoder node initialized")
 
     def start_ffmpeg(self):
-        args = (
-            ffmpeg
-            .input('pipe:0', format='rawvideo', pix_fmt='bgr8', s=f'{self.width}x{self.height}', framerate=30)
-            .output(
-                'pipe:1',
-                format='h264',
-                vcodec='libx264',
-                pix_fmt='yuv420p',
-                preset='ultrafast',
-                tune='zerolatency',
-                **{'x264-params': 'keyint=1:no-scenecut'}
-            )
-            .compile()
-        )
+        # FFmpeg command to encode raw video to H.264 in Annex B format
+        cmd = [
+            'ffmpeg',
+            '-loglevel', 'quiet',  # Disable FFmpeg logs
+            '-f', 'rawvideo',
+            '-pixel_format', 'bgr24',  # Input format: 24-bit BGR
+            '-video_size', f'{self.width}x{self.height}',  # Image resolution
+            '-framerate', str(self.fps),  # Frame rate
+            '-i', '-',  # Input comes from stdin
+            '-c:v', 'libx264',  # Use H.264 codec
+            '-preset', 'ultrafast',  # Fastest encoding (low latency)
+            '-tune', 'zerolatency',  # Low-latency encoding
+            '-x264-params', 'repeat-headers=1:keyint=30',  # Ensure SPS/PPS before each keyframe
+            '-f', 'h264',  # Output format: H.264 in Annex B
+            '-'  # Output to stdout (FFmpeg will send encoded frames here)
+        ]
 
-        return subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def image_callback(self, msg: Image):
         try:
