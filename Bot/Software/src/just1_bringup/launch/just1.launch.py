@@ -105,7 +105,7 @@ def generate_launch_description():
         name="just1_camera",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'camera'"])
         ),
     )
     ld.add_action(camera_node)
@@ -130,7 +130,7 @@ def generate_launch_description():
         name="just1_camera_encoder",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'camera'"])
         ),
     )
     ld.add_action(camera_encoder_node)
@@ -141,7 +141,7 @@ def generate_launch_description():
         executable="foxglove_bridge",  
         name="foxglove_bridge",  
         output="screen",
-        parameters=[{'port': 8765, 'topic_whitelist': ['/joy', '/wheel_speeds', '/camera/video_compressed']}],
+        parameters=[{'port': 8765, 'topic_whitelist': ['/camera/video_compressed']}],
     )
     ld.add_action(foxglove_bridge_node)
 
