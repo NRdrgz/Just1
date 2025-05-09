@@ -26,6 +26,7 @@ class CameraEncoderNode(Node):
         self.height = 480
         self.fps = 30
         self.bridge = CvBridge()
+        self.buffer = b''  # Persistent buffer for partial data
 
         # Start persistent ffmpeg process
         self.ffmpeg_process = self.start_ffmpeg()
@@ -75,38 +76,37 @@ class CameraEncoderNode(Node):
 
             # Write the image data to ffmpeg's stdin
             self.ffmpeg_process.stdin.write(cv_image.tobytes())
+
+            # Append new data to buffer
+            self.buffer += self.ffmpeg_process.stdout.read(4096)
             
-            # Now read the output from ffmpeg (raw H.264)
-            nal_unit_data = b""
-            while True:
-                byte = self.ffmpeg_process.stdout.read(1)
-                if not byte:
-                    break
-                nal_unit_data += byte
-                
+            # Search for two start codes to extract one full frame
+            start_codes = []
+            i = 0
+            while i < len(self.buffer) - 4:
+                if self.buffer[i:i+4] == b'\x00\x00\x00\x01':
+                    start_codes.append(i)
+                    i += 1
+                elif self.buffer[i:i+3] == b'\x00\x00\x01':
+                    start_codes.append(i)
+                    i += 1
+                else:
+                    i += 1
 
-                # Look for NAL unit start code (0x000001)
-                if len(nal_unit_data) >= 4:
-                    # Found the NAL unit start code (0x000001), slice the frame
-                    frame_start = nal_unit_data.find(b'\x00\x00\x01')  # Find the start code
-                    if frame_start != -1:
-                        self.get_logger().info('NAL unit start code found')
-                        # Frame found; extract it
-                        frame = nal_unit_data[frame_start:]
-                        nal_unit_data = b""
+            if len(start_codes) >= 2:
+                frame_start = start_codes[0]
+                frame_end = start_codes[1]
+                frame_data = self.buffer[frame_start:frame_end]
+                self.buffer = self.buffer[frame_end:]  # Keep the remaining data
 
-                        break
-
-            frame_data = frame
-            self.get_logger().info(f'frame_data: {frame_data}')
-
-            if frame_data:
+                # Publish frame
                 out_msg = CompressedVideo()
                 out_msg.timestamp = msg.header.stamp
                 out_msg.frame_id = msg.header.frame_id
                 out_msg.format = "h264"
                 out_msg.data = frame_data
                 self.publisher.publish(out_msg)
+                self.get_logger().info(f"Published compressed frame of size {len(frame_data)} bytes")
 
         except Exception as e:
             self.get_logger().error(f"Encoding failed: {e}")
