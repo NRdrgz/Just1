@@ -44,6 +44,7 @@ class CameraEncoderNode(Node):
             '-c:v', 'libx264',  # Use H.264 codec
             '-preset', 'ultrafast',  # Fastest encoding (low latency)
             '-tune', 'zerolatency',  # Low-latency encoding
+            '-g', '1',           # Force each frame to be a keyframe (IDR)
             '-x264-params', 'repeat-headers=1:keyint=30',  # Ensure SPS/PPS before each keyframe
             '-f', 'h264',  # Output format: H.264 in Annex B
             '-'  # Output to stdout (FFmpeg will send encoded frames here)
