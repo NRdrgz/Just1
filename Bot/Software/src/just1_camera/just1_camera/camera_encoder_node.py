@@ -70,43 +70,36 @@ class CameraEncoderNode(Node):
 
             # Feed frame to FFmpeg
             self.ffmpeg_process.stdin.write(msg.data)
-            self.ffmpeg_process.stdin.flush()
-
-            # Read complete H.264 frame
-            # H.264 frames start with 0x00 0x00 0x00 0x01 (start code)
-            frame_data = bytearray()
-            start_code = b'\x00\x00\x00\x01'
-            found_start = False
             
+            # Now read the output from ffmpeg (raw H.264)
+            nal_unit_data = b""
             while True:
-                chunk = self.ffmpeg_process.stdout.read(4096)
-                print(f'chunk: {chunk}')
-                if not chunk:
+                byte = self.ffmpeg_process.stdout.read(1)
+                if not byte:
                     break
-                    
-                if not found_start:
-                    # Look for start code
-                    idx = chunk.find(start_code)
-                    if idx != -1:
-                        found_start = True
-                        chunk = chunk[idx:]
-                
-                if found_start:
-                    frame_data.extend(chunk)
-                    # Check if we've found the next start code (indicating end of current frame)
-                    if len(frame_data) >= 8:  # Need at least 8 bytes to check for next start code
-                        last_bytes = frame_data[-8:]
-                        if start_code in last_bytes:
-                            # Remove the next frame's start code
-                            frame_data = frame_data[:-4]
-                            break
-            print(f'frame_data: {frame_data}')
+                nal_unit_data += byte
+                print(f'nal_unit_data: {nal_unit_data}')
+
+                # Look for NAL unit start code (0x00000001)
+                if len(nal_unit_data) >= 4 and nal_unit_data[-4:] == b'\x00\x00\x00\x01':
+                    # Found the NAL unit start code (0x00000001), slice the frame
+                    frame_start = nal_unit_data.find(b'\x00\x00\x00\x01')  # Find the start code
+                    if frame_start != -1:
+                        print('NAL unit start code found')
+                        # Frame found; extract it
+                        frame = nal_unit_data[frame_start:]
+                        nal_unit_data = nal_unit_data[frame_start + len(frame):]
+
+                        break
+
+            frame_data = frame
+
             if frame_data:
                 out_msg = CompressedVideo()
                 out_msg.timestamp = msg.header.stamp
                 out_msg.frame_id = msg.header.frame_id
                 out_msg.format = "h264"
-                out_msg.data = bytes(frame_data)
+                out_msg.data = frame_data
                 self.publisher.publish(out_msg)
 
         except Exception as e:
