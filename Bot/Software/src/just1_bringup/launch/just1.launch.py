@@ -129,7 +129,7 @@ def generate_launch_description():
         executable="foxglove_bridge",  
         name="foxglove_bridge",  
         output="screen",
-        parameters=[{'port': 8765, 'send_buffer_limit': '100000000'}],
+        parameters=[{'port': 8765, 'send_buffer_limit': 100000000}],
     )
     ld.add_action(foxglove_bridge_node)
 
