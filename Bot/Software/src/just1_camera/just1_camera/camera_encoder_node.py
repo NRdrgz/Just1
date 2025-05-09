@@ -48,7 +48,7 @@ class CameraEncoderNode(Node):
             .compile()
         )
 
-        return subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        return subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def image_callback(self, msg: Image):
         try:
@@ -59,6 +59,11 @@ class CameraEncoderNode(Node):
             expected_size = self.width * self.height * 3
             if len(msg.data) != expected_size:
                 self.get_logger().error(f"Unexpected image size: {len(msg.data)} != {expected_size}")
+                return
+            
+            if self.ffmpeg_process.poll() is not None:
+                err = self.ffmpeg_process.stderr.read().decode()
+                self.get_logger().error(f"FFmpeg crashed:\n{err}")
                 return
 
             # Feed frame to FFmpeg
