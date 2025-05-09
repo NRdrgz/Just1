@@ -32,7 +32,8 @@ class CameraEncoderNode(Node):
                 "-c:v", "libx264",
                 "-preset", "ultrafast",
                 "-tune", "zerolatency",
-                "-x264-params", "keyint=1",   # ✅ Force IDR + SPS/PPS in every frame
+                "-x264-params", "keyint=1:repeat-headers=1",  # Ensure SPS in every keyframe
+                "-bsf:v", "h264_mp4toannexb",                  # Ensure Annex B format
                 "-f", "h264",
                 "-"
             ],
