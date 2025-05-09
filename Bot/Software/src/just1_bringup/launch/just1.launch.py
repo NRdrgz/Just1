@@ -133,6 +133,7 @@ def generate_launch_description():
             PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
         ),
     )
+    ld.add_action(camera_encoder_node)
 
     # Foxglove Bridge node. This node is installed through sudo apt install ros-jazzy-foxglove-bridge
     foxglove_bridge_node = Node(
