@@ -24,8 +24,8 @@ class CameraEncoderNode(Node):
 
     def image_callback(self, msg):
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-            success, encoded_image = cv2.imencode('.jpg', cv_image, [int(cv2.IMWRITE_JPEG_QUALITY), self.jpeg_quality])
+            #cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            success, encoded_image = cv2.imencode('.jpg', msg.data, [int(cv2.IMWRITE_JPEG_QUALITY), self.jpeg_quality])
             if success:
                 compressed_msg = CompressedImage()
                 compressed_msg.header = msg.header
