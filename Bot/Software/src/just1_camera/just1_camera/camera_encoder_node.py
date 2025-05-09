@@ -77,36 +77,49 @@ class CameraEncoderNode(Node):
             # Write the image data to ffmpeg's stdin
             self.ffmpeg_process.stdin.write(cv_image.tobytes())
 
-            # Append new data to buffer
-            self.buffer += self.ffmpeg_process.stdout.read(4096)
-            
-            # Search for two start codes to extract one full frame
-            start_codes = []
-            i = 0
-            while i < len(self.buffer) - 4:
-                if self.buffer[i:i+4] == b'\x00\x00\x00\x01':
-                    start_codes.append(i)
-                    i += 1
-                elif self.buffer[i:i+3] == b'\x00\x00\x01':
-                    start_codes.append(i)
-                    i += 1
-                else:
+            # Read stdout until we have at least two start codes
+            found_frame = False
+            max_reads = 10  # Prevent infinite loop in case of broken stream
+            read_count = 0
+
+            while not found_frame and read_count < max_reads:
+                chunk = self.ffmpeg_process.stdout.read(4096)
+                if not chunk:
+                    break  # EOF or broken pipe
+
+                self.buffer += chunk
+
+                # Detect NAL start codes (00 00 00 01 or 00 00 01)
+                start_codes = []
+                i = 0
+                while i < len(self.buffer) - 4:
+                    if self.buffer[i:i+4] == b'\x00\x00\x00\x01':
+                        start_codes.append(i)
+                    elif self.buffer[i:i+3] == b'\x00\x00\x01':
+                        start_codes.append(i)
                     i += 1
 
-            if len(start_codes) >= 2:
-                frame_start = start_codes[0]
-                frame_end = start_codes[1]
-                frame_data = self.buffer[frame_start:frame_end]
-                self.buffer = self.buffer[frame_end:]  # Keep the remaining data
+                if len(start_codes) >= 2:
+                    frame_start = start_codes[0]
+                    frame_end = start_codes[1]
+                    frame_data = self.buffer[frame_start:frame_end]
+                    self.buffer = self.buffer[frame_end:]  # Keep excess data
 
-                # Publish frame
-                out_msg = CompressedVideo()
-                out_msg.timestamp = msg.header.stamp
-                out_msg.frame_id = msg.header.frame_id
-                out_msg.format = "h264"
-                out_msg.data = frame_data
-                self.publisher.publish(out_msg)
-                self.get_logger().info(f"Published compressed frame of size {len(frame_data)} bytes")
+                    # Publish the compressed frame
+                    out_msg = CompressedVideo()
+                    out_msg.timestamp = msg.header.stamp
+                    out_msg.frame_id = msg.header.frame_id
+                    out_msg.format = "h264"
+                    out_msg.data = frame_data
+                    self.publisher.publish(out_msg)
+
+                    self.get_logger().info(f"Published compressed frame of size {len(frame_data)} bytes")
+                    found_frame = True
+
+                read_count += 1
+
+            if not found_frame:
+                self.get_logger().warn("Failed to find two NAL unit start codes after multiple reads")
 
         except Exception as e:
             self.get_logger().error(f"Encoding failed: {e}")
