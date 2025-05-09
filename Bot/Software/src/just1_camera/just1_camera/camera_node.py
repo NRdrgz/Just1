@@ -37,8 +37,8 @@ class CameraNode(Node):
             {
                 "AeEnable": True,
                 "FrameDurationLimits": (
-                    (1 / self.fps) * 1000000,
-                    (1 / self.fps) * 1000000,
+                    int((1 / self.fps) * 1000000),
+                    int((1 / self.fps) * 1000000),
                 ),  
                 "NoiseReductionMode": 0,  # Disable noise reduction for lower latency
             }
