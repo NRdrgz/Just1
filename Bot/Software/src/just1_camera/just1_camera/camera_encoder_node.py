@@ -75,11 +75,12 @@ class CameraEncoderNode(Node):
             # Read complete H.264 frame
             # H.264 frames start with 0x00 0x00 0x00 0x01 (start code)
             frame_data = bytearray()
-            start_code = bytes([0x00, 0x00, 0x00, 0x01])
+            start_code = b'\x00\x00\x00\x01'
             found_start = False
             
             while True:
                 chunk = self.ffmpeg_process.stdout.read(4096)
+                print(f'chunk: {chunk}')
                 if not chunk:
                     break
                     
@@ -99,7 +100,7 @@ class CameraEncoderNode(Node):
                             # Remove the next frame's start code
                             frame_data = frame_data[:-4]
                             break
-            print(frame_data)
+            print(f'frame_data: {frame_data}')
             if frame_data:
                 out_msg = CompressedVideo()
                 out_msg.timestamp = msg.header.stamp
