@@ -3,9 +3,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from foxglove_msgs.msg import CompressedVideo
 
-import av
-import numpy as np
-from fractions import Fraction
+import subprocess
 
 class CameraEncoderNode(Node):
     def __init__(self):
@@ -26,41 +24,73 @@ class CameraEncoderNode(Node):
         self.width = 640
         self.height = 480
         self.fps = 30
+
+        # Start persistent ffmpeg process
+        self.ffmpeg_process = self.start_ffmpeg()
         
-        # Initialize codec
-        self.codec = av.codec.CodecContext.create("libx264", "w")
-        self.codec.options = {
-            "preset": "ultrafast",
-            "tune": "zerolatency",
-            "repeat-headers": "1",
-        }
-        self.codec.width = self.width
-        self.codec.height = self.height
-        self.codec.time_base = Fraction(1, self.fps)
-        self.codec.pix_fmt = "yuv420p"
-        self.codec.open()
+    def start_ffmpeg(self):
+        # FFmpeg command to encode raw video to H.264 in Annex B format
+        cmd = [
+            'ffmpeg',
+            '-loglevel', 'quiet',  # Disable FFmpeg logs
+            '-f', 'rawvideo',
+            '-pixel_format', 'bgr24', 
+            '-video_size', f'{self.width}x{self.height}',  # Image resolution
+            '-framerate', str(self.fps),  # Frame rate
+            '-i', '-',  # Input comes from stdin
+            '-c:v', 'libx264',  # Use H.264 codec
+            '-preset', 'ultrafast',  # Fastest encoding (low latency)
+            '-tune', 'zerolatency',  # Low-latency encoding
+            '-x264-params', 'repeat-headers=1:keyint=30',  # Ensure SPS/PPS before each keyframe
+            '-f', 'h264',  # Output format: H.264 in Annex B
+            '-'  # Output to stdout (FFmpeg will send encoded frames here)
+        ]
+
+        return subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def image_callback(self, msg: Image):
         try:
-            # Convert raw image data to numpy array
-            img = np.frombuffer(msg.data, dtype=np.uint8).reshape((self.height, self.width, 3))
+            if msg.encoding != 'bgr8':
+                self.get_logger().error(f"Unsupported image encoding: {msg.encoding}")
+                return
 
-            # Convert to PyAV VideoFrame
-            frame = av.VideoFrame.from_ndarray(img, format="bgr24")
-            frame.pts = None
+            expected_size = self.width * self.height * 3
+            if len(msg.data) != expected_size:
+                self.get_logger().error(f"Unexpected image size: {len(msg.data)} != {expected_size}")
+                return
+            
+            if self.ffmpeg_process.poll() is not None:
+                err = self.ffmpeg_process.stderr.read().decode()
+                self.get_logger().error(f"FFmpeg crashed:\n{err}")
+                return
 
-            # Encode
-            packets = self.codec.encode(frame)
-            for packet in packets:
+            # Feed frame to FFmpeg
+            self.ffmpeg_process.stdin.write(msg.data)
+            
+
+            # Read and publish H264 frame
+            # This is required by Foxglove: https://docs.foxglove.dev/docs/visualization/message-schemas/compressed-video
+            frame = self.ffmpeg_process.stdout.read(4096)
+            print(frame)
+            if frame:
                 out_msg = CompressedVideo()
                 out_msg.timestamp = msg.header.stamp
                 out_msg.frame_id = msg.header.frame_id
                 out_msg.format = "h264"
-                out_msg.data = packet
+                out_msg.data = frame
                 self.publisher.publish(out_msg)
 
         except Exception as e:
             self.get_logger().error(f"Encoding failed: {e}")
+
+    def cleanup(self):
+        if self.ffmpeg_process:
+            try:
+                self.ffmpeg_process.stdin.close()
+                self.ffmpeg_process.stdout.close()
+                self.ffmpeg_process.terminate()
+            except Exception as e:
+                self.get_logger().warn(f"Error shutting down FFmpeg: {e}")
 
 
 def main(args=None):
@@ -71,6 +101,7 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        node.cleanup()
         rclpy.shutdown()
 
 
