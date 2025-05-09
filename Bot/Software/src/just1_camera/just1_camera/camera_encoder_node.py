@@ -62,6 +62,11 @@ class CameraEncoderNode(Node):
             # Write raw bytes to FFmpeg's stdin for encoding
             self.ffmpeg.stdin.write(raw_bytes)
 
+            # Check if there's any error output from FFmpeg
+            err_output = self.ffmpeg.stderr.read()
+            if err_output:
+                self.get_logger().warn(f"FFmpeg stderr: {err_output.decode('utf-8')}")
+
             # Read the encoded frame from FFmpeg's stdout (make sure it's a full frame)
             encoded_frame = self.read_full_frame()
 
