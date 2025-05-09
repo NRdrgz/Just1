@@ -25,6 +25,7 @@ class CameraEncoderNode(Node):
 
         self.width = 640
         self.height = 480
+        self.fps = 30
         self.read_buffer = bytearray()
 
         # Start persistent ffmpeg process
