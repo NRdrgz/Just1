@@ -115,6 +115,7 @@ def generate_launch_description():
 
     # WebSocket bridge node
     # Deactivated for now as using Foxglove Bridge node instead
+    
     # web_socket_bridge_node = Node(
     #     package="just1_camera",
     #     executable="camera_web_socket",
