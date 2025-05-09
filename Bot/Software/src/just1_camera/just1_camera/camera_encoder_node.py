@@ -42,7 +42,6 @@ class CameraEncoderNode(Node):
                 pix_fmt='yuv420p',
                 preset='ultrafast',
                 tune='zerolatency',
-                bsf='dump_extra',
                 **{'x264-params': 'keyint=1:no-scenecut'}
             )
             .compile()
