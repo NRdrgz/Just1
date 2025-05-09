@@ -83,12 +83,12 @@ class CameraEncoderNode(Node):
                 if not byte:
                     break
                 nal_unit_data += byte
-                print(f'nal_unit_data: {nal_unit_data}')
+                #print(f'nal_unit_data: {nal_unit_data}')
 
-                # Look for NAL unit start code (0x00000001)
-                if len(nal_unit_data) >= 4 and nal_unit_data[-4:] == b'\x00\x00\x00\x01':
-                    # Found the NAL unit start code (0x00000001), slice the frame
-                    frame_start = nal_unit_data.find(b'\x00\x00\x00\x01')  # Find the start code
+                # Look for NAL unit start code (0x000001)
+                if len(nal_unit_data) >= 4 and nal_unit_data[-4:] == b'\x00\x00\x01':
+                    # Found the NAL unit start code (0x000001), slice the frame
+                    frame_start = nal_unit_data.find(b'\x00\x00\x01')  # Find the start code
                     if frame_start != -1:
                         print('NAL unit start code found')
                         # Frame found; extract it
