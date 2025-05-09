@@ -38,7 +38,7 @@ class CameraEncoderNode(Node):
             'ffmpeg',
             '-loglevel', 'quiet',  # Disable FFmpeg logs
             '-f', 'rawvideo',
-            '-pixel_format', 'bgr24',  # Input format: 24-bit BGR
+            '-pixel_format', 'bgr8', 
             '-video_size', f'{self.width}x{self.height}',  # Image resolution
             '-framerate', str(self.fps),  # Frame rate
             '-i', '-',  # Input comes from stdin
