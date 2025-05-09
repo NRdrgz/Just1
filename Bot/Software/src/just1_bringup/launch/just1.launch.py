@@ -111,16 +111,17 @@ def generate_launch_description():
     ld.add_action(camera_node)
 
     # WebSocket bridge node
-    web_socket_bridge_node = Node(
-        package="just1_camera",
-        executable="camera_web_socket",
-        name="just1_camera_web_socket",
-        output="screen",
-        condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
-        ),
-    )
-    ld.add_action(web_socket_bridge_node)
+    # Deactivated for now as using Foxglove Bridge node instead
+    # web_socket_bridge_node = Node(
+    #     package="just1_camera",
+    #     executable="camera_web_socket",
+    #     name="just1_camera_web_socket",
+    #     output="screen",
+    #     condition=IfCondition(
+    #         PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+    #     ),
+    # )
+    # ld.add_action(web_socket_bridge_node)
 
     # Foxglove Bridge node. This node is installed through sudo apt install ros-jazzy-foxglove-bridge
     foxglove_bridge_node = Node(
@@ -128,7 +129,7 @@ def generate_launch_description():
         executable="foxglove_bridge",  
         name="foxglove_bridge",  
         output="screen",
-        parameters=[{'port': 8765}],
+        parameters=[{'port': 8765, 'send_buffer_limit': '100000000'}],
     )
     ld.add_action(foxglove_bridge_node)
 
