@@ -5,6 +5,7 @@ from foxglove_msgs.msg import CompressedVideo
 
 import av
 import numpy as np
+from fractions import Fraction
 
 class CameraEncoderNode(Node):
     def __init__(self):
@@ -35,7 +36,7 @@ class CameraEncoderNode(Node):
         }
         self.codec.width = self.width
         self.codec.height = self.height
-        self.codec.time_base = av.Rational(1, self.fps)
+        self.codec.time_base = Fraction(1, self.fps)
         self.codec.pix_fmt = "yuv420p"
         self.codec.open()
 
