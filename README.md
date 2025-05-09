@@ -29,7 +29,7 @@ Located in `/Bot/Software`:
 - Complete hardware design with BoM and SolidWorks files
 - Comprehensive software documentation for Raspberry Pi setup
 - Manual control using Nintendo Controller
-- Real-time camera feed accessible via web interface
+- Real-time camera feed accessible via homemade web interface or through Foxglove
 
 ## Features in Progress
 
@@ -41,6 +41,7 @@ Located in `/Bot/Software`:
 - Create detailed README for Hardware folder
 - Add assembly and wiring documentation
 - Add control and camera feedback on phone
+- Use Foxglove CompressedVideo instead of CompressedImage for Camera feedback
 
 ## Long-term Goals and Potential Improvements
 

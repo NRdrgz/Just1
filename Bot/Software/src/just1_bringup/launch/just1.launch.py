@@ -10,7 +10,10 @@ def generate_launch_description():
     # Create launch description
     ld = LaunchDescription()
 
-    # Add argument for mode selection
+    ################ 
+    # Add arguments for mode selection
+    ################ 
+
     mode_arg = DeclareLaunchArgument(
         "mode",
         default_value="manual",
@@ -18,7 +21,9 @@ def generate_launch_description():
     )
     ld.add_action(mode_arg)
 
+    ################ 
     # Add arguments for diagnostics
+    ################ 
 
     # To test wheel, run:
     # ros2 launch just1_bringup just1.launch.py mode:=diagnostics test_wheel:=front_left
@@ -108,7 +113,7 @@ def generate_launch_description():
         name="just1_camera",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'camera'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
         ),
     )
     ld.add_action(camera_node)
@@ -134,7 +139,7 @@ def generate_launch_description():
         name="just1_camera_encoder",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'camera'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
         ),
     )
     ld.add_action(camera_encoder_node)
@@ -145,7 +150,10 @@ def generate_launch_description():
         executable="foxglove_bridge",  
         name="foxglove_bridge",  
         output="screen",
-        parameters=[{'port': 8765, 'topic_whitelist': ['/camera/image_compressed']}],
+        parameters=[{'port': 8765, 'topic_whitelist': ['/wheel_speeds', '/camera/image_compressed']}],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
     ld.add_action(foxglove_bridge_node)
 

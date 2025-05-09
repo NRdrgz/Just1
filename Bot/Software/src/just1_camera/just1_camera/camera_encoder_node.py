@@ -7,8 +7,10 @@ import cv2
 class CameraEncoderNode(Node):
     def __init__(self):
         super().__init__('camera_encoder_node')
-        self.bridge = CvBridge()
+
         self.jpeg_quality = 85  # JPEG quality (0-100)
+
+        self.bridge = CvBridge()
         self.subscription = self.create_subscription(
             Image,
             '/camera/image_raw',

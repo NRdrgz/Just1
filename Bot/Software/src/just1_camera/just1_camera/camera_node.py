@@ -10,6 +10,10 @@ class CameraNode(Node):
     def __init__(self):
         super().__init__("camera_node")
 
+        self.width = 1920
+        self.height = 1080
+        self.fps = 30
+
         # Create publisher for the camera feed
         self.publisher = self.create_publisher(Image, "camera/image_raw", 10)
 
@@ -21,7 +25,7 @@ class CameraNode(Node):
 
         # Configure camera for optimized performance
         config = self.picam2.create_preview_configuration(
-            main={"size": (640, 480), "format": "BGR888"}
+            main={"size": (self.width, self.height), "format": "BGR888"}
         )
         self.picam2.configure(config)
 
@@ -33,18 +37,17 @@ class CameraNode(Node):
             {
                 "AeEnable": True,
                 "FrameDurationLimits": (
-                    33333,
-                    33333,
-                ),  # 30 FPS for more consistent timing
+                    (1 / self.fps) * 1000000,
+                    (1 / self.fps) * 1000000,
+                ),  
                 "NoiseReductionMode": 0,  # Disable noise reduction for lower latency
             }
         )
 
         # Create timer for publishing frames
         self.timer = self.create_timer(
-            0.033, self.timer_callback
-        )  # 30 FPS for more consistent timing
-
+            1 / self.fps, self.timer_callback
+        )  
         self.get_logger().info("Camera node initialized")
 
     def timer_callback(self):

@@ -73,9 +73,19 @@ source install/setup.bash
 ```
 
 ## Usage
-
 To start the manual control system: <br>
 
 ```bash
 ros2 launch just1_bringup just1.launch.py mode:=manual
 ```
+
+## Get the Video feed
+To see the video captured from the Camera, you can either
+- Use Foxglove (preferred) <br>
+The foxglove_bridge_node used in just1_bringup is used to select the relevant topics to whitelist to Foxglove <br>
+You can then visualize Camera data in a Foxglove UI <br>
+
+- Use the homemade websocket:
+Activate the camera_web_socket node in just1.launch.py <br>
+Navigate to the Web page in src/just1_camera/web/Webpage.html <br>
+Make sure to change the PI ip address in the Webpage <br>
