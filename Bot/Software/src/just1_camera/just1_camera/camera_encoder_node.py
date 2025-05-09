@@ -27,6 +27,8 @@ class CameraEncoderNode(Node):
 
         # Start persistent ffmpeg process
         self.ffmpeg_process = self.start_ffmpeg()
+
+        self.get_logger().info("Camera encoder node started")
         
     def start_ffmpeg(self):
         # FFmpeg command to encode raw video to H.264 in Annex B format
@@ -71,7 +73,7 @@ class CameraEncoderNode(Node):
             # Read and publish H264 frame
             # This is required by Foxglove: https://docs.foxglove.dev/docs/visualization/message-schemas/compressed-video
             frame = self.ffmpeg_process.stdout.read(4096)
-            print(frame)
+            self.get_logger().info("Debug")
             if frame:
                 out_msg = CompressedVideo()
                 out_msg.timestamp = msg.header.stamp
