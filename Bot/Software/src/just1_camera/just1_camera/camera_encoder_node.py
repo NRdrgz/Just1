@@ -51,20 +51,6 @@ class CameraEncoderNode(Node):
 
         return subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
-    def extract_frames(self):
-        """Parse H.264 Annex B stream for complete NAL units (frames)."""
-        frames = []
-        data = self.output_buffer
-        pattern = b'\x00\x00\x00\x01'
-        starts = [m.start() for m in re.finditer(pattern, data)]
-
-        for i in range(len(starts) - 1):
-            frames.append(data[starts[i]:starts[i+1]])
-
-        # Keep the leftover bytes in buffer
-        if starts:
-            self.output_buffer = data[starts[-1]:]
-        return frames
 
     def image_callback(self, msg: Image):
         try:
@@ -89,7 +75,9 @@ class CameraEncoderNode(Node):
             # Read and publish H264 frame
             # This is required by Foxglove: https://docs.foxglove.dev/docs/visualization/message-schemas/compressed-video
             frame = self.ffmpeg_process.stdout.read(64)
-            self.get_logger().info("Debug")
+            print(frame)
+
+            
             if frame:
                 out_msg = CompressedVideo()
                 out_msg.timestamp = msg.header.stamp
