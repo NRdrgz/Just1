@@ -70,20 +70,42 @@ class CameraEncoderNode(Node):
 
             # Feed frame to FFmpeg
             self.ffmpeg_process.stdin.write(msg.data)
-            
+            self.ffmpeg_process.stdin.flush()
 
-            # Read and publish H264 frame
-            # This is required by Foxglove: https://docs.foxglove.dev/docs/visualization/message-schemas/compressed-video
-            frame = self.ffmpeg_process.stdout.read(64)
-            print(frame)
-
+            # Read complete H.264 frame
+            # H.264 frames start with 0x00 0x00 0x00 0x01 (start code)
+            frame_data = bytearray()
+            start_code = bytes([0x00, 0x00, 0x00, 0x01])
+            found_start = False
             
-            if frame:
+            while True:
+                chunk = self.ffmpeg_process.stdout.read(4096)
+                if not chunk:
+                    break
+                    
+                if not found_start:
+                    # Look for start code
+                    idx = chunk.find(start_code)
+                    if idx != -1:
+                        found_start = True
+                        chunk = chunk[idx:]
+                
+                if found_start:
+                    frame_data.extend(chunk)
+                    # Check if we've found the next start code (indicating end of current frame)
+                    if len(frame_data) >= 8:  # Need at least 8 bytes to check for next start code
+                        last_bytes = frame_data[-8:]
+                        if start_code in last_bytes:
+                            # Remove the next frame's start code
+                            frame_data = frame_data[:-4]
+                            break
+            print(frame_data)
+            if frame_data:
                 out_msg = CompressedVideo()
                 out_msg.timestamp = msg.header.stamp
                 out_msg.frame_id = msg.header.frame_id
                 out_msg.format = "h264"
-                out_msg.data = frame
+                out_msg.data = bytes(frame_data)
                 self.publisher.publish(out_msg)
 
         except Exception as e:
