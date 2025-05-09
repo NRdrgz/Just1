@@ -20,101 +20,72 @@ class CameraEncoderNode(Node):
             10
         )
 
-        # Start ffmpeg encoder
-        self.encoder = subprocess.Popen(
-            [
-                "ffmpeg",
-                "-f", "rawvideo",
-                "-pix_fmt", "bgr24",
-                "-s", "640x480",
-                "-r", "30",
-                "-i", "-",
-                "-c:v", "libx264",
-                "-preset", "ultrafast",
-                "-tune", "zerolatency",
-                "-x264-params", "keyint=1:repeat-headers=1",  # Ensure SPS in every keyframe
-                "-bsf:v", "h264_mp4toannexb",                  # Ensure Annex B format
-                "-f", "h264",
-                "-"
-            ],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,  # Silence or redirect as needed
-            bufsize=0
-        )
+        self.width = 640  # Assuming image width
+        self.height = 480  # Assuming image height
+        self.fps = 30  # Assuming frame rate
 
-        self.stdin = self.encoder.stdin
-        self.stdout = io.BufferedReader(self.encoder.stdout)
+        # Start FFmpeg subprocess for H.264 encoding
+        self.ffmpeg = self.start_ffmpeg()
 
-        self.buffer = bytearray()
         self.get_logger().info("Camera encoder node initialized")
-        self.frame_count = 0
+       
 
-    def image_callback(self, msg):
+    def start_ffmpeg(self):
+        # FFmpeg command to encode raw video to H.264 in Annex B format
+        cmd = [
+            'ffmpeg',
+            '-loglevel', 'quiet',  # Disable FFmpeg logs
+            '-f', 'rawvideo',
+            '-pixel_format', 'bgr24',  # Input format: 24-bit BGR
+            '-video_size', f'{self.width}x{self.height}',  # Image resolution
+            '-framerate', str(self.fps),  # Frame rate
+            '-i', '-',  # Input comes from stdin
+            '-c:v', 'libx264',  # Use H.264 codec
+            '-preset', 'ultrafast',  # Fastest encoding (low latency)
+            '-tune', 'zerolatency',  # Low-latency encoding
+            '-x264-params', 'repeat-headers=1:keyint=30',  # Ensure SPS/PPS before each keyframe
+            '-f', 'h264',  # Output format: H.264 in Annex B
+            '-'  # Output to stdout (FFmpeg will send encoded frames here)
+        ]
+
+        return subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    def image_callback(self, msg: Image):
         try:
-            # Only accept expected format
+            # Ensure the image is in bgr8 encoding and the raw bytes are accessible
             if msg.encoding != 'bgr8':
-                self.get_logger().warn(f"Unexpected image encoding: {msg.encoding}, expected bgr8")
+                self.get_logger().error(f"Unsupported encoding: {msg.encoding}")
                 return
 
-            if msg.width != 640 or msg.height != 480:
-                self.get_logger().warn(f"Unexpected image size: {msg.width}x{msg.height}, expected 640x480")
-                return
+            # Directly get the raw byte data from the Image message
+            raw_bytes = bytes(msg.data)
 
-            # Write raw image bytes to encoder
-            self.stdin.write(msg.data)
-            self.stdin.flush()
+            # Write raw bytes to FFmpeg's stdin for encoding
+            self.ffmpeg.stdin.write(raw_bytes)
 
-            # Read and parse a full H.264 frame
-            frame_data = self._read_h264_frame()
-            if frame_data:
-                compressed_msg = CompressedVideo()
-                compressed_msg.timestamp = self.get_clock().now().to_msg()
-                compressed_msg.frame_id = "camera"
-                compressed_msg.format = "h264"
-                compressed_msg.data = frame_data
-                self.publisher.publish(compressed_msg)
-                self.frame_count += 1
+            # Read the encoded frame from FFmpeg's stdout
+            encoded_frame = self.ffmpeg.stdout.read(1024 * 64)  # Read up to 64KB of compressed data
 
-                if self.frame_count % 30 == 0:
-                    self.get_logger().info(f"Published {self.frame_count} frames")
+            if encoded_frame:
+                # Create and publish a CompressedVideo message
+                video_msg = CompressedVideo()
+                video_msg.timestamp = msg.header.stamp
+                video_msg.frame_id = msg.header.frame_id
+                video_msg.data = list(encoded_frame)  # Convert the bytes to list of integers
+                video_msg.format = 'h264'
+
+                # Publish the compressed video message
+                self.publisher.publish(video_msg)
+
         except Exception as e:
-            self.get_logger().error(f"Error in image_callback: {e}")
-
-    def _read_h264_frame(self):
-        try:
-            while True:
-                chunk = self.stdout.read1(4096)
-                if not chunk:
-                    break
-                self.buffer.extend(chunk)
-
-                # Search for start codes
-                frames = []
-                start = 0
-                while True:
-                    next_start = self.buffer.find(H264_START_CODE, start + 4)
-                    if next_start == -1:
-                        break
-                    frames.append(self.buffer[start:next_start])
-                    start = next_start
-                # Leave remaining buffer from last start code
-                if start > 0:
-                    self.buffer = self.buffer[start:]
-
-                # Return the first full frame
-                if frames:
-                    return b"".join(frames)
-        except Exception as e:
-            self.get_logger().error(f"Error reading from encoder: {e}")
-            return None
+            self.get_logger().error(f"Encoding error: {e}")
 
     def cleanup(self):
-        if self.encoder:
+        if self.ffmpeg:
             try:
-                if self.stdin:
-                    self.stdin.close()
-                self.encoder.terminate()
+                if self.ffmpeg.stdin:
+                    self.ffmpeg.stdin.close()
+                self.ffmpeg.terminate()
                 self.encoder.wait(timeout=2)
             except Exception as e:
                 self.get_logger().warn(f"Error during encoder shutdown: {e}")
