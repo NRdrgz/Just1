@@ -32,6 +32,7 @@ class CameraEncoderNode(Node):
                 "-c:v", "libx264",
                 "-preset", "ultrafast",
                 "-tune", "zerolatency",
+                "-x264-params", "keyint=1",   # ✅ Force IDR + SPS/PPS in every frame
                 "-f", "h264",
                 "-"
             ],
