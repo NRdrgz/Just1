@@ -93,7 +93,7 @@ class CameraEncoderNode(Node):
                         self.get_logger().info('NAL unit start code found')
                         # Frame found; extract it
                         frame = nal_unit_data[frame_start:]
-                        nal_unit_data = nal_unit_data[frame_start + len(frame):]
+                        nal_unit_data = b""
 
                         break
 
