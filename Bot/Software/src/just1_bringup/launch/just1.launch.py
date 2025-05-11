@@ -139,7 +139,7 @@ def generate_launch_description():
                 "height": 480,
                 "orientation": "270",  # Flip the Camera
                 "camera": 0,
-                "format": "640x480",
+                "format": "RGB",
             }
         ],
         condition=IfCondition(
