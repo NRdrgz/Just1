@@ -6,6 +6,10 @@ import cv2
 
 
 class CameraEncoderNode(Node):
+    """
+    Camera encoder node for encoding images from the Raspberry Pi camera and publishing them as JPEG compressed messages to visualize in Foxglove.
+    """
+
     def __init__(self):
         super().__init__("camera_encoder_node")
 

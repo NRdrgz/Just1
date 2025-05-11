@@ -7,6 +7,10 @@ import cv2
 
 
 class CameraNode(Node):
+    """
+    Homemade camera node for capturing images from the Raspberry Pi camera and publishing them as ROS2 messages.
+    """
+
     def __init__(self):
         super().__init__("camera_node")
 

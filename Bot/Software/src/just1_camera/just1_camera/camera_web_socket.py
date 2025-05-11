@@ -9,6 +9,11 @@ import threading
 
 
 class CameraWebSocketBridge(Node):
+    """
+    Homemade WebSocket bridge for the camera node.
+    This is not used anymore as we are using Foxglove Bridge node instead.
+    """
+
     def __init__(self):
         super().__init__("camera_web_socket")
         self.bridge = CvBridge()

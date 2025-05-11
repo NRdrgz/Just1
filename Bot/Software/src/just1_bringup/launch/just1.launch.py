@@ -17,7 +17,7 @@ def generate_launch_description():
     mode_arg = DeclareLaunchArgument(
         "mode",
         default_value="manual",
-        description="Operation mode: manual or diagnostics",
+        description="Operation mode: manual, diagnostics, autonomous",
     )
     ld.add_action(mode_arg)
 
@@ -115,11 +115,31 @@ def generate_launch_description():
     ld.add_action(manual_controller_node)
 
     # Camera node
+    # Deactivated for now as using official camera_ros
+    # camera_node = Node(
+    #     package="just1_camera",
+    #     executable="camera_node",
+    #     name="just1_camera",
+    #     output="screen",
+    #     condition=IfCondition(
+    #         PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+    #     ),
+    # )
+    # ld.add_action(camera_node)
+
+    # Camera node
     camera_node = Node(
-        package="just1_camera",
+        package="camera_ros",
         executable="camera_node",
-        name="just1_camera",
+        name="camera",
         output="screen",
+        parameters=[
+            {
+                "width": 640,
+                "height": 480,
+                "orientation": "270",  # Flip the Camera
+            }
+        ],
         condition=IfCondition(
             PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
         ),
@@ -128,7 +148,6 @@ def generate_launch_description():
 
     # WebSocket bridge node
     # Deactivated for now as using Foxglove Bridge node instead
-
     # web_socket_bridge_node = Node(
     #     package="just1_camera",
     #     executable="camera_web_socket",
@@ -141,16 +160,17 @@ def generate_launch_description():
     # ld.add_action(web_socket_bridge_node)
 
     # Camera encoder node
-    camera_encoder_node = Node(
-        package="just1_camera",
-        executable="camera_encoder_node",
-        name="just1_camera_encoder",
-        output="screen",
-        condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
-        ),
-    )
-    ld.add_action(camera_encoder_node)
+    # Deactivated for now as using official camera_ros
+    # camera_encoder_node = Node(
+    #     package="just1_camera",
+    #     executable="camera_encoder_node",
+    #     name="just1_camera_encoder",
+    #     output="screen",
+    #     condition=IfCondition(
+    #         PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+    #     ),
+    # )
+    # ld.add_action(camera_encoder_node)
 
     # Foxglove Bridge node. This node is installed through sudo apt install ros-jazzy-foxglove-bridge
     foxglove_bridge_node = Node(

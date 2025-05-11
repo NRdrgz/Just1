@@ -2,6 +2,10 @@
 
 This is a ROS2-based control system for a four-wheeled robot with joystick control.
 
+## References for external ROS packages
+- Camera ROS: https://index.ros.org/p/camera_ros/
+- Foxglove Bridge: https://github.com/foxglove/ros-foxglove-bridge
+- RTAB-Map: https://github.com/introlab/rtabmap_ros
 
 ## Installation
 
@@ -22,7 +26,7 @@ cd Just1/Bot/Software
 
 4. Install Dependencies: <br>
 ```bash
-sudo apt install python3-pip python3-gpiozero python3-pygame libcap-dev ninja-build libyaml-dev python3-yaml python3-ply python3-jinja2 meson libdrm ros-jazzy-foxglove-bridge
+sudo apt install python3-pip python3-gpiozero python3-pygame libcap-dev ninja-build libyaml-dev python3-yaml python3-ply python3-jinja2 meson libdrm ros-jazzy-camera-ros ros-jazzy-foxglove-bridge ros-jazzy-rtabmap-ros
 pip install --break-system-packages -r requirements.txt
 ```
 5. Build libcamera from source <br>
@@ -72,7 +76,8 @@ colcon build --packages-select <package_name> --symlink-install
 source install/setup.bash
 ```
 
-## Usage
+## Usage in Manual
+At this point you can control the robot manually. <br>
 To start the manual control system: <br>
 
 ```bash
@@ -89,3 +94,5 @@ You can then visualize Camera data in a Foxglove UI <br>
 Activate the camera_web_socket node in just1.launch.py <br>
 Navigate to the Web page in src/just1_camera/web/Webpage.html <br>
 Make sure to change the PI ip address in the Webpage <br>
+
+## Continue installation for Autonomous mode
