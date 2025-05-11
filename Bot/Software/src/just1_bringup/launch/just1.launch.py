@@ -160,7 +160,18 @@ def generate_launch_description():
         parameters=[
             {
                 "port": 8765,
-                "topic_whitelist": ["/wheel_speeds", "/camera/image_compressed"],
+                "topic_whitelist": [
+                    "/wheel_speeds",
+                    "/camera/image_compressed",
+                    "/rtabmap/map",
+                    "/rtabmap/cloud_map",
+                    "/rtabmap/global_path",
+                    "/rtabmap/local_path",
+                    "/rtabmap/odom",
+                    "/rtabmap/pose",
+                    "/rtabmap/landmarks",
+                    "/rtabmap/landmarks_cloud",
+                ],
             }
         ],
         condition=IfCondition(
@@ -168,5 +179,48 @@ def generate_launch_description():
         ),
     )
     ld.add_action(foxglove_bridge_node)
+
+    # RTAB-Map node for SLAM
+    rtabmap_node = Node(
+        package="rtabmap_ros",
+        executable="rtabmap",
+        name="rtabmap",
+        output="screen",
+        parameters=[
+            {
+                "subscribe_depth": False,
+                "subscribe_scan": False,
+                "frame_id": "base_link",
+                "database_path": "~/rtabmap.db",
+                "queue_size": 10,
+                "use_sim_time": False,
+                "publish_tf": True,
+                "publish_tf_map": True,
+                # Visual odometry parameters
+                "Vis/FeatureType": "ORB",  # Using ORB features for visual odometry
+                "Vis/CorType": "1",  # Use FLANN for feature matching
+                "Vis/MaxFeatures": "400",  # Maximum number of features to detect
+                "Vis/MinInliers": "20",  # Minimum inliers for motion estimation
+                "Vis/EstimationType": "1",  # Use PnP for pose estimation
+                "Vis/PnPRefineIterations": "1",  # Number of PnP refinement iterations
+                "Odom/Strategy": "0",  # 0=Frame-to-Frame, 1=Frame-to-Map
+                "Odom/ResetCountdown": "0",  # Don't reset odometry
+                "Odom/GuessMotion": "true",  # Use previous motion as initial guess
+                "Odom/VisKeyFrameThr": "0.6",  # Keyframe threshold
+                "Odom/VisMinInliers": "15",  # Minimum inliers for visual odometry
+                "Odom/VisMaxSize": "1500",  # Maximum image size for processing
+                "Odom/VisCorNNDR": "0.6",  # Nearest neighbor distance ratio
+                "Odom/VisCorType": "1",  # Use FLANN for visual odometry matching
+            }
+        ],
+        remappings=[
+            ("rgb/image", "/camera/image_raw"),
+            ("rgb/camera_info", "/camera/camera_info"),
+        ],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
+    )
+    ld.add_action(rtabmap_node)
 
     return ld
