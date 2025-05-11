@@ -51,7 +51,11 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        rclpy.shutdown()
+        try:
+            node.destroy_node()
+            rclpy.shutdown()
+        except Exception as e:
+            print(f"Error during shutdown: {e}")
 
 
 if __name__ == "__main__":
