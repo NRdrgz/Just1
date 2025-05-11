@@ -137,7 +137,7 @@ def generate_launch_description():
             {
                 "width": 640,
                 "height": 480,
-                "orientation": "270",  # Flip the Camera
+                "orientation": "180",  # Flip the Camera
                 "camera": 0,
                 "format": "RGB888",
             }
