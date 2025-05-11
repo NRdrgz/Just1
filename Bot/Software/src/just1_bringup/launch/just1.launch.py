@@ -138,6 +138,8 @@ def generate_launch_description():
                 "width": 640,
                 "height": 480,
                 "orientation": "270",  # Flip the Camera
+                "camera": 0,
+                "format": "640x480",
             }
         ],
         condition=IfCondition(
@@ -181,7 +183,7 @@ def generate_launch_description():
         parameters=[
             {
                 "port": 8765,
-                "topic_whitelist": ["/wheel_speeds", "/camera/image_compressed"],
+                "topic_whitelist": ["/wheel_speeds", "/camera/image_raw/compressed"],
             }
         ],
         condition=IfCondition(
