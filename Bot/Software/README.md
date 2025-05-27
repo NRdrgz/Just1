@@ -26,7 +26,7 @@ cd Just1/Bot/Software
 
 4. Install Dependencies: <br>
 ```bash
-sudo apt install python3-pip python3-gpiozero python3-pygame libcap-dev ninja-build libyaml-dev python3-yaml python3-ply python3-jinja2 meson libdrm ros-jazzy-foxglove-bridge 
+sudo apt install python3-pip python3-gpiozero python3-pygame libcap-dev ninja-build libyaml-dev python3-yaml python3-ply python3-jinja2 meson libdrm ros-jazzy-foxglove-bridge python3-smbus i2c-tools
 pip install --break-system-packages -r requirements.txt
 ```
 5. Build libcamera from source <br>
@@ -96,7 +96,3 @@ Navigate to the Web page in src/just1_camera/web/Webpage.html <br>
 Make sure to change the PI ip address in the Webpage <br>
 
 ## Continue installation for Autonomous mode
-
-1. Perform Camera Calibration
-
-2.
