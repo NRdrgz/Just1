@@ -171,7 +171,7 @@ def generate_launch_description():
                     "/rtabmap/pose",
                     "/rtabmap/landmarks",
                     "/rtabmap/landmarks_cloud",
-                    "/imu/data",
+                    "/imu/data_raw",
                 ],
             }
         ],
