@@ -97,6 +97,5 @@ Make sure to change the PI ip address in the Webpage <br>
 
 ## Continue installation for Autonomous mode
 
-1. Perform Camera Calibration
 
-2.
+

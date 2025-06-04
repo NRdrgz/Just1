@@ -49,7 +49,6 @@ Located in `/Bot/Software`:
 - Perform Navigation through Neural Network architecture instead of VSLAM 
 - Replace AA batteries with voltage booster for simplified power management
 - Integrate LIDAR system, IMU and/or wheel encoders for advanced navigation and experimentation
-- Integrate Analytics solution such as Foxglove Studio to experiment with it 
 - Integrate memory / latency profilers to optimize processes and detect memory leaks
 
 
