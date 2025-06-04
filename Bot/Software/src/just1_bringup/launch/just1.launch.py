@@ -171,6 +171,7 @@ def generate_launch_description():
                     "/rtabmap/pose",
                     "/rtabmap/landmarks",
                     "/rtabmap/landmarks_cloud",
+                    "/imu/data",
                 ],
             }
         ],
@@ -179,5 +180,17 @@ def generate_launch_description():
         ),
     )
     ld.add_action(foxglove_bridge_node)
+
+    # IMU node
+    imu_node = Node(
+        package="just1_imu",
+        executable="imu_node",
+        name="just1_imu",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
+    )
+    ld.add_action(imu_node)
 
     return ld

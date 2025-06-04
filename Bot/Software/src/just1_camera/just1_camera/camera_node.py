@@ -57,10 +57,6 @@ class CameraNode(Node):
             # Capture frame directly in BGR format
             frame = self.picam2.capture_array()
 
-            # Flip the frame vertically and horizontally
-            frame = cv2.flip(frame, 0)
-            frame = cv2.flip(frame, 1)
-
             # Convert frame to ROS2 message
             msg = self.bridge.cv2_to_imgmsg(frame, "bgr8")
 
