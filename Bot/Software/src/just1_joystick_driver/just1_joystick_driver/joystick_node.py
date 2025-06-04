@@ -15,10 +15,9 @@ class JoystickDriver(Node):
         # Check if any joysticks are connected
         joystick_count = pygame.joystick.get_count()
         if joystick_count == 0:
-            self.get_logger().error(
+            self.get_logger().info(
                 "No controllers detected. Please connect a controller and restart the program."
             )
-            raise RuntimeError("No joystick detected")
 
         self.get_logger().info(f"Found {joystick_count} controller(s)")
 

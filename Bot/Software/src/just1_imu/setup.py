@@ -1,11 +1,11 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
-package_name = "just1_camera"
+package_name = "just1_imu"
 
 setup(
     name=package_name,
     version="0.0.1",
-    packages=[package_name],
+    packages=find_packages(exclude=["test"]),
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
@@ -14,14 +14,12 @@ setup(
     zip_safe=True,
     maintainer="Nico",
     maintainer_email="nicolasrdrgzrosdev@protonmail.com",
-    description="Camera driver for Just1 robot",
+    description="Package for IMU MPU6050 sensor.",
     license="Apache License 2.0",
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "camera_node = just1_camera.camera_node:main",
-            "camera_web_socket = just1_camera.camera_web_socket:main",
-            "camera_encoder_node = just1_camera.camera_encoder_node:main",
+            "imu_node = just1_imu.imu_node:main",
         ],
     },
 )
