@@ -172,6 +172,7 @@ def generate_launch_description():
                     "/rtabmap/landmarks",
                     "/rtabmap/landmarks_cloud",
                     "/imu/data_raw",
+                    "/LiDAR/LD19",
                 ],
             }
         ],
