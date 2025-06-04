@@ -4,7 +4,7 @@ from sensor_msgs.msg import Imu
 import smbus
 import math
 import time
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple
 
 
 class MPU6050Error(Exception):
