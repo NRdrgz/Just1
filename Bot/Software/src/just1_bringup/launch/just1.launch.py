@@ -160,20 +160,6 @@ def generate_launch_description():
         parameters=[
             {
                 "port": 8765,
-                "topic_whitelist": [
-                    "/wheel_speeds",
-                    "/camera/image_compressed",
-                    "/rtabmap/map",
-                    "/rtabmap/cloud_map",
-                    "/rtabmap/global_path",
-                    "/rtabmap/local_path",
-                    "/rtabmap/odom",
-                    "/rtabmap/pose",
-                    "/rtabmap/landmarks",
-                    "/rtabmap/landmarks_cloud",
-                    "/imu/data_raw",
-                    "/scan",
-                ],
             }
         ],
         condition=IfCondition(
