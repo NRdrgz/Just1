@@ -188,10 +188,28 @@ def generate_launch_description():
         output="screen",
         parameters=[
             {"use_mag": False},
-            {"fixed_frame": "base_link"},
+            {"publish_tf": False},  # We let ICP deal with the odom->base_link tf
         ],
     )
     ld.add_action(filter_imu_node)
+
+    # Static transform publisher to define the position and orientation of the IMU relative to the robot's base
+    base_link_to_imu_tf_node = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="base_link_to_base_imu",
+        # Arguments: [x, y, z, roll, pitch, yaw, parent_frame, child_frame]
+        # x: 0 meters (no offset in x direction)
+        # y: 0 meters (no offset in y direction)
+        # z: meters (no offset in y direction)
+        # yaw: 0 radians (no yaw rotation)
+        # pitch: 0 radians (no pitch rotation)
+        # roll: 0 radians (no roll rotation)
+        # parent_frame: base_link (robot's base frame)
+        # child_frame: base_imu (IMU's frame)
+        arguments=["0", "0", "0", "0", "0", "0", "base_link", "base_imu"],
+    )
+    ld.add_action(base_link_to_imu_tf_node)
 
     ## Source from Lidar Driver https://wiki.youyeetoo.com/en/Lidar/D300
     # LiDAR node configuration for LD19 model
