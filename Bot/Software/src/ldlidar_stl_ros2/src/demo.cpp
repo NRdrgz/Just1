@@ -29,7 +29,7 @@ uint64_t GetSystemTimeStamp(void);
 
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<rclcpp::Node>("ldlidar_published"); // create a ROS2 Node
+  auto node = std::make_shared<rclcpp::Node>("LD19"); // create a ROS2 Node
   std::string product_name;
 	std::string topic_name;
 	std::string port_name;
