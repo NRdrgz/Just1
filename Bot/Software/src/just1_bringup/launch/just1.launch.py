@@ -276,7 +276,6 @@ def generate_launch_description():
         remappings=[
             ("/imu/data", "/imu"),
         ],
-        arguments=["--ros-args", "--log-level", "warn"],
     )
 
     ld.add_action(icp_odom_node)
