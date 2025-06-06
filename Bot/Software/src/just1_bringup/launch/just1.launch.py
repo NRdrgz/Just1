@@ -180,6 +180,19 @@ def generate_launch_description():
     )
     ld.add_action(imu_node)
 
+    # Filter IMU node
+    filter_imu_node = Node(
+        package="imu_filter_madgwick",
+        executable="imu_filter_madgwick_node",
+        name="imu_filter_madgwick",
+        output="screen",
+        parameters=[
+            {"use_mag": False},
+            {"fixed_frame": "base_link"},
+        ],
+    )
+    ld.add_action(filter_imu_node)
+
     ## Source from Lidar Driver https://wiki.youyeetoo.com/en/Lidar/D300
     # LiDAR node configuration for LD19 model
     ldlidar_node = Node(
@@ -261,6 +274,7 @@ def generate_launch_description():
             {"subscribe_scan": True},
             {"subscribe_imu": True},
         ],
+        arguments=["--ros-args", "--log-level", "warn"],
     )
 
     ld.add_action(rtabmap_slam_node)
