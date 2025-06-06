@@ -249,8 +249,8 @@ def generate_launch_description():
 
     # Rtabmap SLAM Node
     rtabmap_slam_node = Node(
-        package="rtabmap_ros",
-        executable="rtabmap_slam",
+        package="rtabmap_slam",
+        executable="rtabmap",
         name="rtabmap_slam",
         output="screen",
         parameters=[
