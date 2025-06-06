@@ -257,6 +257,7 @@ def generate_launch_description():
             {"frame_id": "base_link"},
             {"odom_frame_id": "odom"},
             {"subscribe_depth": False},
+            {"subscribe_rgb": False},
             {"subscribe_scan": True},
             {"subscribe_imu": True},
         ],
