@@ -273,6 +273,9 @@ def generate_launch_description():
             {"publish_tf": True},  # Publishes TF from odom -> base_link
             {"queue_size": 10},
             {"wait_imu_to_init": True},
+            {
+                "expected_update_rate": 15
+            },  # Lidar is at 10 Hz so putting it a bit faster
         ],
         remappings=[
             ("/imu", "/imu/data"),
