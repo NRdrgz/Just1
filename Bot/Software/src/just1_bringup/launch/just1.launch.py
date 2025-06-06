@@ -239,7 +239,6 @@ def generate_launch_description():
             {"frame_id": "base_link"},  # Robot base frame
             {"odom_frame_id": "odom"},  # Odometry frame to publish
             {"scan_topic": "/scan"},  # 2D Lidar topic
-            {"wait_imu_to_init": True},
             {"publish_tf": True},  # Publishes TF from odom -> base_link
             {"queue_size": 10},
         ],
