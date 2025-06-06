@@ -218,12 +218,12 @@ def generate_launch_description():
         # x: 0 meters (no offset in x direction)
         # y: 0 meters (no offset in y direction)
         # z: 0.12 meters (LiDAR mounted 12cm above base)
-        # roll: 0 radians (no roll rotation)
-        # pitch: 0 radians (no pitch rotation)
         # yaw: 1.5708 radians (90 degrees rotation around z-axis)
+        # pitch: 0 radians (no pitch rotation)
+        # roll: 1.5708 radians (no pitch rotation)
         # parent_frame: base_link (robot's base frame)
         # child_frame: base_laser (LiDAR's frame)
-        arguments=["0", "0", "0.12", "0", "0", "1.5708", "base_link", "base_laser"],
+        arguments=["0", "0", "0.12", "1.5708", "0", "0", "base_link", "base_laser"],
     )
 
     ld.add_action(ldlidar_node)
