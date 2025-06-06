@@ -242,6 +242,7 @@ def generate_launch_description():
             {"publish_tf": True},  # Publishes TF from odom -> base_link
             {"queue_size": 10},
         ],
+        arguments=["--ros-args", "--log-level", "warn"],
     )
 
     ld.add_action(icp_odom_node)
