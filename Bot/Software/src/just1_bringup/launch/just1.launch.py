@@ -206,8 +206,8 @@ def generate_launch_description():
         # pitch: 0 radians (no pitch rotation)
         # roll: 0 radians (no roll rotation)
         # parent_frame: base_link (robot's base frame)
-        # child_frame: base_imu (IMU's frame)
-        arguments=["0.07", "0", "0", "0", "0", "0", "base_link", "base_imu"],
+        # child_frame: imu_link (IMU's frame)
+        arguments=["0.07", "0", "0", "0", "0", "0", "base_link", "imu_link"],
     )
     ld.add_action(base_link_to_imu_tf_node)
 
