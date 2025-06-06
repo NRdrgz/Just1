@@ -275,7 +275,7 @@ def generate_launch_description():
             {"wait_imu_to_init": True},
         ],
         remappings=[
-            ("/imu/data", "/imu"),
+            ("/imu", "/imu/data"),
         ],
         arguments=["--ros-args", "--log-level", "warn"],
     )
@@ -298,7 +298,7 @@ def generate_launch_description():
             {"wait_for_transform": 0.5},
         ],
         remappings=[
-            ("/imu/data", "/imu"),
+            ("/imu", "/imu/data"),
         ],
         arguments=["--ros-args", "--log-level", "warn"],
     )
