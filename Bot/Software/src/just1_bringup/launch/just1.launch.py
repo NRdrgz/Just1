@@ -207,7 +207,7 @@ def generate_launch_description():
         # roll: 0 radians (no roll rotation)
         # parent_frame: base_link (robot's base frame)
         # child_frame: base_imu (IMU's frame)
-        arguments=["0.7", "0", "0", "0", "0", "0", "base_link", "base_imu"],
+        arguments=["0.07", "0", "0", "0", "0", "0", "base_link", "base_imu"],
     )
     ld.add_action(base_link_to_imu_tf_node)
 
@@ -294,6 +294,7 @@ def generate_launch_description():
             {"subscribe_rgb": False},
             {"subscribe_scan": True},
             {"subscribe_imu": True},
+            {"wait_for_transform": 0.5},
         ],
         remappings=[
             ("/imu/data", "/imu"),
