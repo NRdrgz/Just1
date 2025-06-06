@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
       default:
         break;
     }
-
+    rclcpp::spin_some(node);
     r.sleep();
   }
 
