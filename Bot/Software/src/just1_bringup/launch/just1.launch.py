@@ -199,7 +199,7 @@ def generate_launch_description():
         executable="static_transform_publisher",
         name="base_link_to_base_imu",
         # Arguments: [x, y, z, roll, pitch, yaw, parent_frame, child_frame]
-        # x: 0 meters (no offset in x direction)
+        # x: 0.07 meters (IMU mounted 7cm in front of base)
         # y: 0 meters (no offset in y direction)
         # z: meters (no offset in y direction)
         # yaw: 0 radians (no yaw rotation)
@@ -207,7 +207,7 @@ def generate_launch_description():
         # roll: 0 radians (no roll rotation)
         # parent_frame: base_link (robot's base frame)
         # child_frame: base_imu (IMU's frame)
-        arguments=["0", "0", "0", "0", "0", "0", "base_link", "base_imu"],
+        arguments=["0.7", "0", "0", "0", "0", "0", "base_link", "base_imu"],
     )
     ld.add_action(base_link_to_imu_tf_node)
 
@@ -273,6 +273,9 @@ def generate_launch_description():
             {"publish_tf": True},  # Publishes TF from odom -> base_link
             {"queue_size": 10},
         ],
+        remappings=[
+            ("/imu/data", "/imu"),
+        ],
         arguments=["--ros-args", "--log-level", "warn"],
     )
 
@@ -291,6 +294,9 @@ def generate_launch_description():
             {"subscribe_rgb": False},
             {"subscribe_scan": True},
             {"subscribe_imu": True},
+        ],
+        remappings=[
+            ("/imu/data", "/imu"),
         ],
         arguments=["--ros-args", "--log-level", "warn"],
     )
