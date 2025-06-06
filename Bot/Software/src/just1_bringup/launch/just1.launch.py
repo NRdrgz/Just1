@@ -181,31 +181,49 @@ def generate_launch_description():
     ld.add_action(imu_node)
 
     ## Source from Lidar Driver https://wiki.youyeetoo.com/en/Lidar/D300
-    # Lidar node
+    # LiDAR node configuration for LD19 model
     ldlidar_node = Node(
         package="ldlidar_stl_ros2",
         executable="ldlidar_stl_ros2_node",
         name="LD19",
         output="screen",
         parameters=[
+            # Model name of the LiDAR sensor
             {"product_name": "LDLiDAR_LD19"},
+            # ROS2 topic name for publishing laser scan data
             {"topic_name": "scan"},
+            # Frame ID for the LiDAR sensor in the TF tree
             {"frame_id": "base_laser"},
+            # Serial port where the LiDAR is connected
             {"port_name": "/dev/ttyUSB0"},
+            # Baud rate for serial communication with the LiDAR
             {"port_baudrate": 230400},
+            # Direction of laser scan (True = clockwise, False = counter-clockwise)
             {"laser_scan_dir": True},
+            # Enable/disable angle cropping functionality
             {"enable_angle_crop_func": False},
+            # Minimum angle for cropping (in degrees)
             {"angle_crop_min": 135.0},
+            # Maximum angle for cropping (in degrees)
             {"angle_crop_max": 225.0},
         ],
     )
 
-    # base_link to base_laser tf node
+    # Static transform publisher to define the position and orientation of the LiDAR relative to the robot's base
     base_link_to_laser_tf_node = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
         name="base_link_to_base_laser_ld19",
-        arguments=["0", "0", "0.18", "0", "0", "0", "base_link", "base_laser"],
+        # Arguments: [x, y, z, roll, pitch, yaw, parent_frame, child_frame]
+        # x: 0 meters (no offset in x direction)
+        # y: 0 meters (no offset in y direction)
+        # z: 0.12 meters (LiDAR mounted 12cm above base)
+        # roll: 0 radians (no roll rotation)
+        # pitch: 0 radians (no pitch rotation)
+        # yaw: 1.5708 radians (90 degrees rotation around z-axis)
+        # parent_frame: base_link (robot's base frame)
+        # child_frame: base_laser (LiDAR's frame)
+        arguments=["0", "0", "0.12", "0", "0", "1.5708", "base_link", "base_laser"],
     )
 
     ld.add_action(ldlidar_node)
