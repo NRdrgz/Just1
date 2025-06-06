@@ -247,4 +247,21 @@ def generate_launch_description():
 
     ld.add_action(icp_odom_node)
 
+    # Rtabmap SLAM Node
+    rtabmap_slam_node = Node(
+        package="rtabmap_ros",
+        executable="rtabmap_slam",
+        name="rtabmap_slam",
+        output="screen",
+        parameters=[
+            {"frame_id": "base_link"},
+            {"odom_frame_id": "odom"},
+            {"subscribe_depth": False},
+            {"subscribe_scan": True},
+            {"subscribe_imu": True},
+        ],
+    )
+
+    ld.add_action(rtabmap_slam_node)
+
     return ld
