@@ -229,4 +229,24 @@ def generate_launch_description():
     ld.add_action(ldlidar_node)
     ld.add_action(base_link_to_laser_tf_node)
 
+    # ICP Odometry Node
+    icp_odom_node = Node(
+        package="rtabmap_odom",
+        executable="icp_odometry",
+        name="icp_odometry",
+        output="screen",
+        parameters=[
+            {"frame_id": "base_link"},  # Robot base frame
+            {"odom_frame_id": "odom"},  # Odometry frame to publish
+            {"scan_topic": "/scan"},  # 2D Lidar topic
+            {"wait_for_transform": True},
+            {"publish_tf": True},  # Publishes TF from odom -> base_link
+            {"queue_size": 10},
+            {"approx_sync": True},
+            {"icp2d": True},  # Enable 2D ICP
+        ],
+    )
+
+    ld.add_action(icp_odom_node)
+
     return ld
