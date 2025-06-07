@@ -33,7 +33,7 @@ class MPU6050Publisher(Node):
 
         # Declare parameters
         self.declare_parameter("i2c_bus", 1)
-        self.declare_parameter("publish_rate", 30.0)
+        self.declare_parameter("publish_rate", 10.0)
         self.declare_parameter("calibration_samples", 100)
         self.declare_parameter("gyro_range", 250)  # in degrees/s
         self.declare_parameter("accel_range", 2)  # in g
