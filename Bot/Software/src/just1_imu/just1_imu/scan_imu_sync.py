@@ -2,25 +2,21 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan, Imu
 from message_filters import Subscriber, ApproximateTimeSynchronizer
-from rclpy.qos import qos_profile_sensor_data
+import copy
 
 
 class ScanImuSync(Node):
     """
-    Node for synchronizing scan and imu data.
+    Node for synchronizing scan and imu data, publishing them with the same timestamp.
     """
 
     def __init__(self):
         super().__init__("scan_imu_sync")
-        self.scan_sub = Subscriber(
-            self, LaserScan, "/scan", qos_profile=qos_profile_sensor_data
-        )
-        self.imu_sub = Subscriber(
-            self, Imu, "/imu/data", qos_profile=qos_profile_sensor_data
-        )
+        self.scan_sub = Subscriber(self, LaserScan, "/scan", 10)
+        self.imu_sub = Subscriber(self, Imu, "/imu/data", 10)
 
         self.ts = ApproximateTimeSynchronizer(
-            [self.scan_sub, self.imu_sub], queue_size=100, slop=0.05
+            [self.scan_sub, self.imu_sub], queue_size=10, slop=0.05
         )
         self.ts.registerCallback(self.sync_callback)
 
@@ -28,13 +24,29 @@ class ScanImuSync(Node):
         self.imu_pub = self.create_publisher(Imu, "/imu/synced", 10)
 
     def sync_callback(self, scan, imu):
-        self.scan_pub.publish(scan)
-        self.imu_pub.publish(imu)
+        # Use scan's timestamp as the synchronized time
+        synced_time = scan.header.stamp
+
+        # Deep copy and update timestamps
+        synced_scan = copy.deepcopy(scan)
+        synced_scan.header.stamp = synced_time
+
+        synced_imu = copy.deepcopy(imu)
+        synced_imu.header.stamp = synced_time
+
+        self.scan_pub.publish(synced_scan)
+        self.imu_pub.publish(synced_imu)
 
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ScanImuSync()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        node = ScanImuSync()
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        print(f"Error: {str(e)}")
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()

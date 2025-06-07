@@ -304,7 +304,8 @@ def generate_launch_description():
             {"subscribe_rgb": False},
             {"subscribe_scan": True},
             {"subscribe_imu": True},
-            {"wait_for_transform": 0.5},
+            {"wait_for_transform": 0.2},
+            {"approx_sync": True},
         ],
         remappings=[
             ("/imu", "/imu/synced"),
