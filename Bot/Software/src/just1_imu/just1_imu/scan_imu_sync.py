@@ -40,6 +40,7 @@ class ScanImuSync(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+    node = None
     try:
         node = ScanImuSync()
         rclpy.spin(node)
@@ -48,5 +49,6 @@ def main(args=None):
     except Exception as e:
         print(f"Error: {str(e)}")
     finally:
-        node.destroy_node()
+        if node is not None:
+            node.destroy_node()
         rclpy.shutdown()
