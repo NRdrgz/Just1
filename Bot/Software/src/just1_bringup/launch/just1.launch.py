@@ -190,8 +190,8 @@ def generate_launch_description():
         parameters=[
             {"use_mag": False},
             {"publish_tf": False},  # We let ICP deal with the odom->base_link tf
-            {"gain": 0.1},
-            {"zeta": 0.0},
+            {"gain": 0.2},
+            {"zeta": 0.02},
         ],
     )
     ld.add_action(filter_imu_node)
