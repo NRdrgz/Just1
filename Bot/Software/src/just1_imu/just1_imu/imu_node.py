@@ -111,6 +111,12 @@ class MPU6050Publisher(Node):
 
         self.get_logger().info("Sensor calibration completed")
 
+    def _apply_deadzone(self, value: float, threshold: float = 0.06) -> float:
+        """Apply a deadzone to the value.
+        This is to prevent the robot from moving when the IMU is not moving.
+        """
+        return 0.0 if abs(value) < threshold else value
+
     def _read_word(self, register: int) -> int:
         """
         Read a word from the MPU6050.
@@ -184,9 +190,9 @@ class MPU6050Publisher(Node):
             imu_msg.linear_acceleration.z = accel_z * accel_scale
 
             # Fill angular velocity (in rad/s)
-            imu_msg.angular_velocity.x = gyro_x * gyro_scale
-            imu_msg.angular_velocity.y = gyro_y * gyro_scale
-            imu_msg.angular_velocity.z = gyro_z * gyro_scale
+            imu_msg.angular_velocity.x = self.apply_deadzone(gyro_x * gyro_scale)
+            imu_msg.angular_velocity.y = self.apply_deadzone(gyro_y * gyro_scale)
+            imu_msg.angular_velocity.z = self.apply_deadzone(gyro_z * gyro_scale)
 
             # Publish the IMU message
             self.publisher_.publish(imu_msg)
