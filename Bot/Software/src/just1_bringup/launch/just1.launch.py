@@ -189,8 +189,8 @@ def generate_launch_description():
         output="screen",
         parameters=[
             {"use_mag": False},
-            {"fixed_frame": "odom_madgwick"},
-            {"publish_tf": True},  # We let ICP deal with the odom->base_link tf
+            {"stateless": True},
+            {"publish_tf": False},  # We let ICP deal with the odom->base_link tf
             {"gain": 0.3},
             {"zeta": 0.02},
         ],
