@@ -20,6 +20,7 @@ setup(
     entry_points={
         "console_scripts": [
             "imu_node = just1_imu.imu_node:main",
+            "scan_imu_sync = just1_imu.scan_imu_sync:main",
         ],
     },
 )

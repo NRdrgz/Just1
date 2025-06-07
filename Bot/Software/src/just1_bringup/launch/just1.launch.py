@@ -193,6 +193,15 @@ def generate_launch_description():
     )
     ld.add_action(filter_imu_node)
 
+    # Scan IMU Sync node
+    scan_imu_sync_node = Node(
+        package="just1_imu",
+        executable="scan_imu_sync",
+        name="scan_imu_sync",
+        output="screen",
+    )
+    ld.add_action(scan_imu_sync_node)
+
     # Static transform publisher to define the position and orientation of the IMU relative to the robot's base
     base_link_to_imu_tf_node = Node(
         package="tf2_ros",
@@ -275,7 +284,8 @@ def generate_launch_description():
             {"wait_imu_to_init": True},
         ],
         remappings=[
-            ("/imu", "/imu/data"),
+            ("/imu", "/imu/synced"),
+            ("/scan", "/scan/synced"),
         ],
         arguments=["--ros-args", "--log-level", "warn"],
     )
@@ -298,7 +308,8 @@ def generate_launch_description():
             {"wait_for_transform": 0.5},
         ],
         remappings=[
-            ("/imu", "/imu/data"),
+            ("/imu", "/imu/synced"),
+            ("/scan", "/scan/synced"),
         ],
         arguments=["--ros-args", "--log-level", "warn"],
     )
