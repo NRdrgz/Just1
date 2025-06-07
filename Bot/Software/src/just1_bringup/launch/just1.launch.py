@@ -281,7 +281,6 @@ def generate_launch_description():
             {"scan_topic": "/scan"},  # 2D Lidar topic
             {"publish_tf": True},  # Publishes TF from odom -> base_link
             {"queue_size": 10},
-            {"wait_imu_to_init": True},
         ],
         remappings=[
             ("/imu", "/imu/synced"),
