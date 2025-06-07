@@ -190,9 +190,9 @@ class MPU6050Publisher(Node):
             imu_msg.linear_acceleration.z = accel_z * accel_scale
 
             # Fill angular velocity (in rad/s)
-            imu_msg.angular_velocity.x = self.apply_deadzone(gyro_x * gyro_scale)
-            imu_msg.angular_velocity.y = self.apply_deadzone(gyro_y * gyro_scale)
-            imu_msg.angular_velocity.z = self.apply_deadzone(gyro_z * gyro_scale)
+            imu_msg.angular_velocity.x = self._apply_deadzone(gyro_x * gyro_scale)
+            imu_msg.angular_velocity.y = self._apply_deadzone(gyro_y * gyro_scale)
+            imu_msg.angular_velocity.z = self._apply_deadzone(gyro_z * gyro_scale)
 
             # Publish the IMU message
             self.publisher_.publish(imu_msg)
