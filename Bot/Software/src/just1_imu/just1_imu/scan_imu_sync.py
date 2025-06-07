@@ -12,8 +12,8 @@ class ScanImuSync(Node):
 
     def __init__(self):
         super().__init__("scan_imu_sync")
-        self.scan_sub = Subscriber(self, LaserScan, "/scan", 10)
-        self.imu_sub = Subscriber(self, Imu, "/imu/data", 10)
+        self.scan_sub = Subscriber(self, LaserScan, "/scan")
+        self.imu_sub = Subscriber(self, Imu, "/imu/data")
 
         self.ts = ApproximateTimeSynchronizer(
             [self.scan_sub, self.imu_sub], queue_size=10, slop=0.05
