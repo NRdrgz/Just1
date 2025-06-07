@@ -185,14 +185,20 @@ class MPU6050Publisher(Node):
             imu_msg.header.frame_id = "imu_link"
 
             # Fill linear acceleration (in m/s²)
-            imu_msg.linear_acceleration.x = accel_x * accel_scale
-            imu_msg.linear_acceleration.y = accel_y * accel_scale
-            imu_msg.linear_acceleration.z = accel_z * accel_scale
+            imu_msg.linear_acceleration.x = self._apply_deadzone(
+                accel_x * accel_scale, 0.4
+            )
+            imu_msg.linear_acceleration.y = self._apply_deadzone(
+                accel_y * accel_scale, 0.4
+            )
+            imu_msg.linear_acceleration.z = self._apply_deadzone(
+                accel_z * accel_scale, 0.4
+            )
 
             # Fill angular velocity (in rad/s)
-            imu_msg.angular_velocity.x = self._apply_deadzone(gyro_x * gyro_scale)
-            imu_msg.angular_velocity.y = self._apply_deadzone(gyro_y * gyro_scale)
-            imu_msg.angular_velocity.z = self._apply_deadzone(gyro_z * gyro_scale)
+            imu_msg.angular_velocity.x = self._apply_deadzone(gyro_x * gyro_scale, 0.06)
+            imu_msg.angular_velocity.y = self._apply_deadzone(gyro_y * gyro_scale, 0.06)
+            imu_msg.angular_velocity.z = self._apply_deadzone(gyro_z * gyro_scale, 0.06)
 
             # Publish the IMU message
             self.publisher_.publish(imu_msg)
