@@ -214,12 +214,12 @@ def generate_launch_description():
         # x: 0.07 meters (IMU mounted 7cm in front of base)
         # y: 0 meters (no offset in y direction)
         # z: meters (no offset in y direction)
-        # yaw: 0 radians (no yaw rotation)
+        # yaw: 3.1415 radians (180 degrees rotation around z-axis)
         # pitch: 0 radians (no pitch rotation)
         # roll: 0 radians (no roll rotation)
         # parent_frame: base_link (robot's base frame)
         # child_frame: imu_link (IMU's frame)
-        arguments=["0.07", "0", "0", "0", "0", "0", "base_link", "imu_link"],
+        arguments=["0.07", "0", "0", "3.1415", "0", "0", "base_link", "imu_link"],
     )
     ld.add_action(base_link_to_imu_tf_node)
 
