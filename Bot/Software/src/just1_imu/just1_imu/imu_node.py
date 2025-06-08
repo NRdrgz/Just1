@@ -167,9 +167,10 @@ class MPU6050Publisher(Node):
             gyro_x, gyro_y, gyro_z = data["gyro"]
 
             # Apply calibration offsets
+            # We do not offset the z-axis in order to keep the gravity acceleration
             accel_x += self.accel_offsets[0]
             accel_y += self.accel_offsets[1]
-            accel_z += self.accel_offsets[2]
+
             gyro_x += self.gyro_offsets[0]
             gyro_y += self.gyro_offsets[1]
             gyro_z += self.gyro_offsets[2]
