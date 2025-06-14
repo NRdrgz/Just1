@@ -20,6 +20,7 @@ setup(
     entry_points={
         "console_scripts": [
             "manual_controller_node = just1_motors.manual_controller_node:main",
+            "keyboard_controller_node = just1_motors.keyboard_controller_node:main",
         ],
     },
 )
