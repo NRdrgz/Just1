@@ -66,7 +66,7 @@ class KeyboardMotorController(Node):
     def _calculate_wheel_speeds(self):
         """Calculate wheel speeds based on currently pressed keys"""
         speeds = {"front_left": 0, "front_right": 0, "back_left": 0, "back_right": 0}
-        base_speed = 80  # Base speed for movements
+        base_speed = 50  # Base speed for movements
 
         # Check which keys are currently pressed
         if keyboard.is_pressed('up'):
