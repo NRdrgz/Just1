@@ -70,9 +70,9 @@ class KeyboardMotorController(Node):
         speeds = {"front_left": 0, "front_right": 0, "back_left": 0, "back_right": 0}
 
         # Check which keys are currently pressed
-        if keyboard.is_pressed('enter'):
+        if keyboard.is_pressed('enter') or keyboard.is_pressed('p') or keyboard.is_pressed('m'):
             self.is_moving = True
-        elif keyboard.is_pressed('space'):
+        elif keyboard.is_pressed('space') or keyboard.is_pressed('x') or keyboard.is_pressed('d') or keyboard.is_pressed('f') or keyboard.is_pressed('g') or keyboard.is_pressed('h') or keyboard.is_pressed('b'):
             self.is_moving = False
 
         # Set speeds based on current state
