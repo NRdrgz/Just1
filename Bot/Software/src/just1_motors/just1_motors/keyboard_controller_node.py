@@ -14,7 +14,7 @@ class KeyboardMotorController(Node):
     
     Controls:
     - Enter: Move forward
-    - Ctrl: Stop
+    - Space: Stop
     """
 
     def __init__(self):
@@ -72,7 +72,7 @@ class KeyboardMotorController(Node):
         # Check which keys are currently pressed
         if keyboard.is_pressed('enter'):
             self.is_moving = True
-        elif keyboard.is_pressed('ctrl'):
+        elif keyboard.is_pressed('space'):
             self.is_moving = False
 
         # Set speeds based on current state
