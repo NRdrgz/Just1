@@ -13,10 +13,8 @@ class KeyboardMotorController(Node):
     It reads keyboard input and publishes the wheel speeds to the wheel_speeds topic.
     
     Controls:
-    - Up Arrow: Move forward
-    - Down Arrow: Move backward
-    - Left Arrow: Spin counterclockwise
-    - Right Arrow: Spin clockwise
+    - Enter: Move forward
+    - Ctrl: Stop
     """
 
     def __init__(self):
@@ -27,6 +25,10 @@ class KeyboardMotorController(Node):
 
         # Create publisher for wheel speeds
         self.publisher = self.create_publisher(WheelSpeeds, "wheel_speeds", 10)
+
+        # Initialize state
+        self.is_moving = False
+        self.base_speed = 40
 
         # Start keyboard listener in a separate thread
         self.keyboard_thread = threading.Thread(target=self._keyboard_listener)
@@ -66,23 +68,18 @@ class KeyboardMotorController(Node):
     def _calculate_wheel_speeds(self):
         """Calculate wheel speeds based on currently pressed keys"""
         speeds = {"front_left": 0, "front_right": 0, "back_left": 0, "back_right": 0}
-        base_speed = 40  # Base speed for movements
 
         # Check which keys are currently pressed
-        if keyboard.is_pressed('up'):
-            speeds = {wheel: base_speed for wheel in speeds.keys()}
-        elif keyboard.is_pressed('down'):
-            speeds = {wheel: -base_speed for wheel in speeds.keys()}
-        elif keyboard.is_pressed('left'):
-            speeds["front_left"] = -base_speed
-            speeds["front_right"] = base_speed
-            speeds["back_left"] = -base_speed
-            speeds["back_right"] = base_speed
-        elif keyboard.is_pressed('right'):
-            speeds["front_left"] = base_speed
-            speeds["front_right"] = -base_speed
-            speeds["back_left"] = base_speed
-            speeds["back_right"] = -base_speed
+        if keyboard.is_pressed('enter'):
+            self.is_moving = True
+        elif keyboard.is_pressed('ctrl'):
+            self.is_moving = False
+
+        # Set speeds based on current state
+        if self.is_moving:
+            speeds = {wheel: self.base_speed for wheel in speeds.keys()}
+        else:
+            speeds = {wheel: 0 for wheel in speeds.keys()}
 
         return speeds
 
