@@ -402,7 +402,7 @@ def generate_launch_description():
     )
 
     ld.add_action(lifecycle_manager)
-    ld.add_action(map_server)
+    # ld.add_action(map_server)
     ld.add_action(planner_server)
     ld.add_action(controller_server)
     ld.add_action(bt_navigator)
