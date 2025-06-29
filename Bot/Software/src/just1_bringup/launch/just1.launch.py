@@ -328,6 +328,7 @@ def generate_launch_description():
 
     ################
     # Nav2 Bringup Nodes
+    # Great resource https://foxglove.dev/blog/autonomous-robot-navigation-and-nav2-the-first-steps
     ################
 
     nav2_params = os.path.join(
