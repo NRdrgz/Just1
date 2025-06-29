@@ -227,7 +227,7 @@ local_costmap:
       filters: ["keepout_filter"]
       keepout_filter:
         plugin: "nav2_costmap_2d::KeepoutFilter"
-        enabled: KEEPOUT_ZONE_ENABLED
+        enabled: True
         filter_info_topic: "keepout_costmap_filter_info"
         override_lethal_cost: True
         lethal_override_cost: 200
