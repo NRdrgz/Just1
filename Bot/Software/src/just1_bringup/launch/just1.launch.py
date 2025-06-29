@@ -348,7 +348,7 @@ def generate_launch_description():
                     "planner_server",
                     "controller_server",
                     "bt_navigator",
-                    "behaviors",
+                    "behavior_server",
                 ]
             },
         ],
