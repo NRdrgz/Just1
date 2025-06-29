@@ -26,7 +26,7 @@ cd Just1/Bot/Software
 
 4. Install Dependencies: <br>
 ```bash
-sudo apt install python3-pip python3-gpiozero python3-pygame libcap-dev ninja-build libyaml-dev python3-yaml python3-ply python3-jinja2 meson libdrm ros-jazzy-foxglove-bridge python3-smbus i2c-tools ros-jazzy-rtabmap-ros ros-jazzy-imu-filter-madgwick
+sudo apt install python3-pip python3-gpiozero python3-pygame libcap-dev ninja-build libyaml-dev python3-yaml python3-ply python3-jinja2 meson libdrm ros-jazzy-foxglove-bridge python3-smbus i2c-tools ros-jazzy-rtabmap-ros ros-jazzy-imu-filter-madgwick ros-jazzy-navigation2 ros-jazzy-nav2-bringup
 pip install --break-system-packages -r requirements.txt
 ```
 5. Build libcamera from source <br>

@@ -4,6 +4,8 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.conditions import IfCondition
 from launch.actions import SetEnvironmentVariable
+import os
+from ament_index_python.packages import get_package_share_directory
 
 
 def generate_launch_description():
@@ -197,6 +199,8 @@ def generate_launch_description():
     ld.add_action(filter_imu_node)
 
     # Scan IMU Sync node
+    # Published to /imu/synced
+    # This node is used to sync the IMU data with the LiDAR data
     scan_imu_sync_node = Node(
         package="just1_imu",
         executable="scan_imu_sync",
@@ -273,6 +277,7 @@ def generate_launch_description():
     ld.add_action(base_link_to_laser_tf_node)
 
     # ICP Odometry Node
+    # Published to /odom based on the LiDAR scan and IMU data
     icp_odom_node = Node(
         package="rtabmap_odom",
         executable="icp_odometry",
@@ -295,6 +300,8 @@ def generate_launch_description():
     ld.add_action(icp_odom_node)
 
     # Rtabmap SLAM Node
+    # Published to /map
+    # This node is used to create a map of the environment
     rtabmap_slam_node = Node(
         package="rtabmap_slam",
         executable="rtabmap",
@@ -318,5 +325,97 @@ def generate_launch_description():
     )
 
     ld.add_action(rtabmap_slam_node)
+
+    ################
+    # Nav2 Bringup Nodes
+    ################
+
+    nav2_params = os.path.join(
+        get_package_share_directory("just1_bringup"), "config", "nav2_params.yaml"
+    )
+    # Lifecycle manager (starts up all Nav2 nodes)
+    lifecycle_manager = Node(
+        package="nav2_lifecycle_manager",
+        executable="lifecycle_manager",
+        name="lifecycle_manager_navigation",
+        output="screen",
+        parameters=[
+            {"use_sim_time": False},
+            {"autostart": True},
+            {
+                "node_names": [
+                    "map_server",
+                    "planner_server",
+                    "controller_server",
+                    "recoveries_server",
+                    "bt_navigator",
+                    "behavior_server",
+                ]
+            },
+        ],
+    )
+
+    # Loads and publishes the static occupancy grid map on the /map topic.
+    # Useful when navigating with a pre-built map
+    map_server = Node(
+        package="nav2_map_server",
+        executable="map_server",
+        name="map_server",
+        output="screen",
+        parameters=[nav2_params],
+    )
+
+    # Computes a global path from the robot’s current location to the goal using the map.
+    planner_server = Node(
+        package="nav2_planner",
+        executable="planner_server",
+        name="planner_server",
+        output="screen",
+        parameters=[nav2_params],
+    )
+
+    # Converts the global path into velocity commands (on /cmd_vel) for real-time control.
+    controller_server = Node(
+        package="nav2_controller",
+        executable="controller_server",
+        name="controller_server",
+        output="screen",
+        parameters=[nav2_params],
+    )
+
+    # Runs recovery behaviors (e.g., rotate in place) when the robot is stuck
+    recoveries_server = Node(
+        package="nav2_recoveries",
+        executable="recoveries_server",
+        name="recoveries_server",
+        output="screen",
+        parameters=[nav2_params],
+    )
+
+    # Implements a behavior tree-based navigation system that combines path planning, obstacle avoidance, and recovery behaviors.
+    bt_navigator = Node(
+        package="nav2_bt_navigator",
+        executable="bt_navigator",
+        name="bt_navigator",
+        output="screen",
+        parameters=[nav2_params],
+    )
+
+    # Manages the behavior tree (BT) for the robot’s navigation.
+    behavior_server = Node(
+        package="nav2_behavior_server",
+        executable="behavior_server",
+        name="behavior_server",
+        output="screen",
+        parameters=[nav2_params],
+    )
+
+    ld.add_action(lifecycle_manager)
+    ld.add_action(map_server)
+    ld.add_action(planner_server)
+    ld.add_action(controller_server)
+    ld.add_action(recoveries_server)
+    ld.add_action(bt_navigator)
+    ld.add_action(behavior_server)
 
     return ld
