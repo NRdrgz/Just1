@@ -47,47 +47,47 @@ controller_server:
       stop_time_buffer: 0.2
       critic_plugins: ["GoalAlign", "PathAlign", "GoalDist", "Obstacle", "Oscillation", "Time"]
     
-    # Ensures the robot's heading is aligned with the goal orientation.
-    # The 'tolerance' defines how close the heading needs to be to consider it aligned.
-    GoalAlign:
-      plugin: "dwb_critics::GoalAlignCritic"
-      tolerance: 0.05
-      scale: 24.0
+      # Ensures the robot's heading is aligned with the goal orientation.
+      # The 'tolerance' defines how close the heading needs to be to consider it aligned.
+      GoalAlign:
+        plugin: "dwb_critics::GoalAlignCritic"
+        tolerance: 0.05
+        scale: 24.0
 
-    # Ensures the robot's path is aligned with the goal path.
-    # The 'forward_point_distance' defines how far ahead the robot should look to check if it's on the path.
-    PathAlign:
-      plugin: "dwb_critics::PathAlignCritic"
-      forward_point_distance: 0.325
-      scale: 32.0
+      # Ensures the robot's path is aligned with the goal path.
+      # The 'forward_point_distance' defines how far ahead the robot should look to check if it's on the path.
+      PathAlign:
+        plugin: "dwb_critics::PathAlignCritic"
+        forward_point_distance: 0.325
+        scale: 32.0
 
-    # Ensures the robot is close enough to the goal.
-    # The 'tolerance' defines how close the robot needs to be to the goal to consider it close enough.
-    GoalDist:
-      plugin: "dwb_critics::GoalDistCritic"
-      tolerance: 0.10
+      # Ensures the robot is close enough to the goal.
+      # The 'tolerance' defines how close the robot needs to be to the goal to consider it close enough.
+      GoalDist:
+        plugin: "dwb_critics::GoalDistCritic"
+        tolerance: 0.10
 
-    # Ensures the robot is not too close to obstacles.
-    # The 'obstacle_range' defines how far the robot should look for obstacles.
-    # The 'scaling_factor' defines how much the obstacle cost should be scaled by.
-    # The 'costmap_obstacle_range' defines how far the robot should look for obstacles in the costmap.
-    Obstacle:
-      plugin: "dwb_critics::ObstacleCritic"
-      obstacle_range: 2.5
-      scaling_factor: 0.75
-      costmap_obstacle_range: 2.5
+      # Ensures the robot is not too close to obstacles.
+      # The 'obstacle_range' defines how far the robot should look for obstacles.
+      # The 'scaling_factor' defines how much the obstacle cost should be scaled by.
+      # The 'costmap_obstacle_range' defines how far the robot should look for obstacles in the costmap.
+      Obstacle:
+        plugin: "dwb_critics::ObstacleCritic"
+        obstacle_range: 2.5
+        scaling_factor: 0.75
+        costmap_obstacle_range: 2.5
 
-    # Ensures the robot is not oscillating.
-    # The 'oscillation_timeout' defines how long the robot should oscillate for to consider it oscillating.
-    Oscillation:
-      plugin: "dwb_critics::OscillationCritic"
-      oscillation_timeout: 0.25
+      # Ensures the robot is not oscillating.
+      # The 'oscillation_timeout' defines how long the robot should oscillate for to consider it oscillating.
+      Oscillation:
+        plugin: "dwb_critics::OscillationCritic"
+        oscillation_timeout: 0.25
 
-    # Ensures the robot is not taking too long to reach the goal.
-    # The 'max_time_penalty' defines how much the robot should be penalized for taking too long to reach the goal.
-    Time:
-      plugin: "dwb_critics::TimeCritic"
-      max_time_penalty: 0.25
+      # Ensures the robot is not taking too long to reach the goal.
+      # The 'max_time_penalty' defines how much the robot should be penalized for taking too long to reach the goal.
+      Time:
+        plugin: "dwb_critics::TimeCritic"
+        max_time_penalty: 0.25
 
 planner_server:
   ros__parameters:
