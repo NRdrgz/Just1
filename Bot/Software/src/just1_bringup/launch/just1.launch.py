@@ -408,6 +408,4 @@ def generate_launch_description():
     ld.add_action(bt_navigator)
     ld.add_action(behavior_server)
 
-    print("Nav2 parameters file: ", nav2_params)
-
     return ld
