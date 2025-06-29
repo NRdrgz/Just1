@@ -347,9 +347,8 @@ def generate_launch_description():
                     "map_server",
                     "planner_server",
                     "controller_server",
-                    "recoveries_server",
                     "bt_navigator",
-                    "behavior_server",
+                    "behaviors",
                 ]
             },
         ],
@@ -393,10 +392,10 @@ def generate_launch_description():
     )
 
     # Manages the behavior tree (BT) for the robot’s navigation.
-    behavior_server = Node(
-        package="nav2_behavior_server",
-        executable="behavior_server",
-        name="behavior_server",
+    behaviors = Node(
+        package="nav2_behaviors",
+        executable="nav2_behaviors",
+        name="behaviors",
         output="screen",
         parameters=[nav2_params],
     )
@@ -406,6 +405,6 @@ def generate_launch_description():
     ld.add_action(planner_server)
     ld.add_action(controller_server)
     ld.add_action(bt_navigator)
-    ld.add_action(behavior_server)
+    ld.add_action(behaviors)
 
     return ld
