@@ -383,15 +383,6 @@ def generate_launch_description():
         parameters=[nav2_params],
     )
 
-    # Runs recovery behaviors (e.g., rotate in place) when the robot is stuck
-    recoveries_server = Node(
-        package="nav2_recoveries",
-        executable="recoveries_server",
-        name="recoveries_server",
-        output="screen",
-        parameters=[nav2_params],
-    )
-
     # Implements a behavior tree-based navigation system that combines path planning, obstacle avoidance, and recovery behaviors.
     bt_navigator = Node(
         package="nav2_bt_navigator",
@@ -414,7 +405,6 @@ def generate_launch_description():
     ld.add_action(map_server)
     ld.add_action(planner_server)
     ld.add_action(controller_server)
-    ld.add_action(recoveries_server)
     ld.add_action(bt_navigator)
     ld.add_action(behavior_server)
 
