@@ -46,22 +46,20 @@ controller_server:
       yaw_goal_tolerance: 0.1
       stop_time_buffer: 0.2
       critic_plugins: ["GoalAlignCritic", "PathAlignCritic", "GoalDistCritic", "ObstacleCritic", "OscillationCritic", "TimeCritic"]
-      PathAlign.scale: 32.0
-      GoalAlign.scale: 24.0
-      RotateToGoal.scale: 32.0
-      ObstacleFootprint.scale: 0.02
     
     # Ensures the robot's heading is aligned with the goal orientation.
     # The 'tolerance' defines how close the heading needs to be to consider it aligned.
     GoalAlignCritic:
       plugin: "dwb_critics::GoalAlignCritic"
       tolerance: 0.05
+      scale: 24.0
 
     # Ensures the robot's path is aligned with the goal path.
     # The 'forward_point_distance' defines how far ahead the robot should look to check if it's on the path.
     PathAlignCritic:
       plugin: "dwb_critics::PathAlignCritic"
       forward_point_distance: 0.325
+      scale: 32.0
 
     # Ensures the robot is close enough to the goal.
     # The 'tolerance' defines how close the robot needs to be to the goal to consider it close enough.
