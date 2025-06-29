@@ -344,7 +344,7 @@ def generate_launch_description():
             {"autostart": True},
             {
                 "node_names": [
-                    "map_server",
+                    # "map_server", # Not needed since we are using RTAB-Map
                     "planner_server",
                     "controller_server",
                     "bt_navigator",
@@ -356,13 +356,14 @@ def generate_launch_description():
 
     # Loads and publishes the static occupancy grid map on the /map topic.
     # Useful when navigating with a pre-built map
-    map_server = Node(
-        package="nav2_map_server",
-        executable="map_server",
-        name="map_server",
-        output="screen",
-        parameters=[nav2_params],
-    )
+    # Not needed since we are using RTAB-Map
+    # map_server = Node(
+    #     package="nav2_map_server",
+    #     executable="map_server",
+    #     name="map_server",
+    #     output="screen",
+    #     parameters=[nav2_params],
+    # )
 
     # Computes a global path from the robot’s current location to the goal using the map.
     planner_server = Node(
