@@ -24,70 +24,132 @@ bt_navigator:
 
 controller_server:
   ros__parameters:
-    use_sim_time: false
+    controller_frequency: 20.0
+    costmap_update_timeout: 0.30
+    min_x_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.5
+    min_theta_velocity_threshold: 0.001
+    failure_tolerance: 0.3
+    progress_checker_plugins: ["progress_checker"]
+    goal_checker_plugins: ["general_goal_checker"] # "precise_goal_checker"
     controller_plugins: ["FollowPath"]
+    use_realtime_priority: false
+    speed_limit_topic: "speed_limit"
+
+    # Progress checker parameters
+    progress_checker:
+      plugin: "nav2_controller::SimpleProgressChecker"
+      required_movement_radius: 0.5
+      movement_time_allowance: 10.0
+    # Goal checker parameters
+    #precise_goal_checker:
+    #  plugin: "nav2_controller::SimpleGoalChecker"
+    #  xy_goal_tolerance: 0.25
+    #  yaw_goal_tolerance: 0.25
+    #  stateful: True
+    general_goal_checker:
+      stateful: True
+      plugin: "nav2_controller::SimpleGoalChecker"
+      xy_goal_tolerance: 0.25
+      yaw_goal_tolerance: 0.25
     FollowPath:
-      plugin: "dwb_core::DWBLocalPlanner"
-      debug_trajectory_details: false
-      min_vel_x: 0.0
-      max_vel_x: 0.4
-      min_vel_theta: -1.5
-      max_vel_theta: 1.5
-      acc_lim_x: 0.5
-      acc_lim_theta: 1.0
-      decel_lim_x: -0.5
-      decel_lim_theta: -1.0
-      vx_samples: 20
-      theta_samples: 20
-      sim_time: 2.0
-      linear_granularity: 0.05
-      angular_granularity: 0.05
-      xy_goal_tolerance: 0.2
-      yaw_goal_tolerance: 0.1
-      stop_time_buffer: 0.2
-      critic_plugins: ["GoalAlign", "PathAlign", "GoalDist", "Obstacle", "Oscillation", "Time"]
-    
-      # Ensures the robot's heading is aligned with the goal orientation.
-      # The 'tolerance' defines how close the heading needs to be to consider it aligned.
-      GoalAlign:
-        plugin: "dwb_critics::GoalAlignCritic"
-        tolerance: 0.05
-        scale: 24.0
-
-      # Ensures the robot's path is aligned with the goal path.
-      # The 'forward_point_distance' defines how far ahead the robot should look to check if it's on the path.
-      PathAlign:
-        plugin: "dwb_critics::PathAlignCritic"
-        forward_point_distance: 0.325
-        scale: 32.0
-
-      # Ensures the robot is close enough to the goal.
-      # The 'tolerance' defines how close the robot needs to be to the goal to consider it close enough.
-      GoalDist:
-        plugin: "dwb_critics::GoalDistCritic"
-        tolerance: 0.10
-
-      # Ensures the robot is not too close to obstacles.
-      # The 'obstacle_range' defines how far the robot should look for obstacles.
-      # The 'scaling_factor' defines how much the obstacle cost should be scaled by.
-      # The 'costmap_obstacle_range' defines how far the robot should look for obstacles in the costmap.
-      Obstacle:
-        plugin: "dwb_critics::ObstacleCritic"
-        obstacle_range: 2.5
-        scaling_factor: 0.75
-        costmap_obstacle_range: 2.5
-
-      # Ensures the robot is not oscillating.
-      # The 'oscillation_timeout' defines how long the robot should oscillate for to consider it oscillating.
-      Oscillation:
-        plugin: "dwb_critics::OscillationCritic"
-        oscillation_timeout: 0.25
-
-      # Ensures the robot is not taking too long to reach the goal.
-      # The 'max_time_penalty' defines how much the robot should be penalized for taking too long to reach the goal.
-      Time:
-        plugin: "dwb_critics::TimeCritic"
-        max_time_penalty: 0.25
+      plugin: "nav2_mppi_controller::MPPIController"
+      time_steps: 56
+      model_dt: 0.05
+      batch_size: 2000
+      ax_max: 3.0
+      ax_min: -3.0
+      ay_max: 3.0
+      ay_min: -3.0
+      az_max: 3.5
+      vx_std: 0.2
+      vy_std: 0.2
+      wz_std: 0.4
+      vx_max: 0.5
+      vx_min: -0.35
+      vy_max: 0.5
+      wz_max: 1.9
+      iteration_count: 1
+      prune_distance: 1.7
+      transform_tolerance: 0.1
+      temperature: 0.3
+      gamma: 0.015
+      motion_model: "DiffDrive"
+      visualize: true
+      publish_optimal_trajectory: true
+      regenerate_noises: true
+      TrajectoryVisualizer:
+        trajectory_step: 5
+        time_step: 3
+      AckermannConstraints:
+        min_turning_r: 0.2
+      critics:
+        [
+          "ConstraintCritic",
+          "CostCritic",
+          "GoalCritic",
+          "GoalAngleCritic",
+          "PathAlignCritic",
+          "PathFollowCritic",
+          "PathAngleCritic",
+          "PreferForwardCritic",
+        ]
+      ConstraintCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 4.0
+      GoalCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 5.0
+        threshold_to_consider: 1.4
+      GoalAngleCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 3.0
+        threshold_to_consider: 0.5
+      PreferForwardCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 5.0
+        threshold_to_consider: 0.5
+      CostCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 3.81
+        near_collision_cost: 253
+        critical_cost: 300.0
+        consider_footprint: false
+        collision_cost: 1000000.0
+        near_goal_distance: 1.0
+        trajectory_point_step: 2
+      PathAlignCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 14.0
+        max_path_occupancy_ratio: 0.05
+        trajectory_point_step: 4
+        threshold_to_consider: 0.5
+        offset_from_furthest: 20
+        use_path_orientations: false
+      PathFollowCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 5.0
+        offset_from_furthest: 5
+        threshold_to_consider: 1.4
+      PathAngleCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 2.0
+        offset_from_furthest: 4
+        threshold_to_consider: 0.5
+        max_angle_to_furthest: 1.0
+        mode: 0
+      # TwirlingCritic:
+      #   enabled: true
+      #   twirling_cost_power: 1
+      #   twirling_cost_weight: 10.0
 
 planner_server:
   ros__parameters:
