@@ -121,7 +121,8 @@ class AutonomousMotorController(Node):
             wheel_speeds: dict containing speeds for each wheel
         """
         # Convert RPM to percentage (-100 to 100)
-        max_rpm = 200  # Maximum expected RPM for the motors
+        # Max forward speed is 0.5 m/s so max RPM is 123
+        max_rpm = 123
 
         for wheel_name, rpm in wheel_speeds.items():
             # Clamp RPM to max_rpm
