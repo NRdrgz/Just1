@@ -124,9 +124,12 @@ class AutonomousMotorController(Node):
         # Max forward speed is 0.5 m/s so max RPM is 123
         max_rpm = 123
 
+        min_rpm = 60
+
         for wheel_name, rpm in wheel_speeds.items():
             # Clamp RPM to max_rpm
             rpm = max(-max_rpm, min(max_rpm, rpm))
+            rpm = max(min_rpm, rpm)
 
             # Convert to percentage
             percentage = int((rpm / max_rpm) * 100)
