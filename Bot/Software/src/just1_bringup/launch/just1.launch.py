@@ -452,7 +452,7 @@ def generate_launch_description():
         name="autonomous_motor_controller",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'autonomous'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
         ),
     )
     ld.add_action(autonomous_motor_controller_node)
