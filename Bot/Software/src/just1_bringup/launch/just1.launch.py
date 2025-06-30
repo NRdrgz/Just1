@@ -123,7 +123,15 @@ def generate_launch_description():
         name="just1_camera",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
     ld.add_action(camera_node)
@@ -148,7 +156,15 @@ def generate_launch_description():
         name="just1_camera_encoder",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
     ld.add_action(camera_encoder_node)
@@ -165,7 +181,15 @@ def generate_launch_description():
             }
         ],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
     ld.add_action(foxglove_bridge_node)
@@ -177,7 +201,15 @@ def generate_launch_description():
         name="just1_imu",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
     ld.add_action(imu_node)
@@ -196,7 +228,15 @@ def generate_launch_description():
             {"zeta": 0.0},
         ],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
     ld.add_action(filter_imu_node)
@@ -210,7 +250,15 @@ def generate_launch_description():
         name="scan_imu_sync",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
     ld.add_action(scan_imu_sync_node)
@@ -231,7 +279,15 @@ def generate_launch_description():
         # child_frame: imu_link (IMU's frame)
         arguments=["0.07", "0", "0", "3.1415", "0", "0", "base_link", "imu_link"],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
     ld.add_action(base_link_to_imu_tf_node)
@@ -264,7 +320,15 @@ def generate_launch_description():
             {"angle_crop_max": 225.0},
         ],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
 
@@ -284,7 +348,15 @@ def generate_launch_description():
         # child_frame: base_laser (LiDAR's frame)
         arguments=["0", "0", "0.12", "1.5708", "0", "0", "base_link", "base_laser"],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
 
@@ -311,7 +383,15 @@ def generate_launch_description():
         ],
         arguments=["--ros-args", "--log-level", "warn"],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
 
@@ -341,7 +421,15 @@ def generate_launch_description():
         ],
         arguments=["--ros-args", "--log-level", "warn"],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(
+                [
+                    "('",
+                    LaunchConfiguration("mode"),
+                    "' == 'manual') or ('",
+                    LaunchConfiguration("mode"),
+                    "' == 'autonomous')",
+                ]
+            )
         ),
     )
 
@@ -375,7 +463,7 @@ def generate_launch_description():
             },
         ],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'autonomous'"])
         ),
     )
 
@@ -390,7 +478,7 @@ def generate_launch_description():
     #     parameters=[nav2_params],
     # )
 
-    # Computes a global path from the robot’s current location to the goal using the map.
+    # Computes a global path from the robot's current location to the goal using the map.
     planner_server = Node(
         package="nav2_planner",
         executable="planner_server",
@@ -398,7 +486,7 @@ def generate_launch_description():
         output="screen",
         parameters=[nav2_params],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'autonomous'"])
         ),
     )
 
@@ -410,7 +498,7 @@ def generate_launch_description():
         output="screen",
         parameters=[nav2_params],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'autonomous'"])
         ),
     )
 
@@ -422,11 +510,11 @@ def generate_launch_description():
         output="screen",
         parameters=[nav2_params],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'autonomous'"])
         ),
     )
 
-    # Manages the behavior tree (BT) for the robot’s navigation.
+    # Manages the behavior tree (BT) for the robot's navigation.
     behavior_server = Node(
         package="nav2_behaviors",
         executable="behavior_server",
@@ -434,7 +522,7 @@ def generate_launch_description():
         output="screen",
         parameters=[nav2_params],
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'autonomous'"])
         ),
     )
 
@@ -452,7 +540,7 @@ def generate_launch_description():
         name="autonomous_motor_controller",
         output="screen",
         condition=IfCondition(
-            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'autonomous'"])
         ),
     )
     ld.add_action(autonomous_motor_controller_node)
