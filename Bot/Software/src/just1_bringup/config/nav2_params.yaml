@@ -126,9 +126,11 @@ controller_server:
       vy_std: 0.2
       wz_std: 0.4
       vx_max: 0.5
-      vx_min: -0.35
+      vx_min: -0.5
       vy_max: 0.5
       wz_max: 1.9
+      min_speed_xy: 0.25
+      min_speed_theta: 0.1
       iteration_count: 1
       prune_distance: 1.7
       transform_tolerance: 0.1
