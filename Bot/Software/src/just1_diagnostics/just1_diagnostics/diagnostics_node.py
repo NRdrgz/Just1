@@ -115,7 +115,7 @@ class DiagnosticsNode(Node):
 
         if movement_name in movement_map:
             movement_map[movement_name](speed)
-            time.sleep(2)
+            time.sleep(10)
             stop_all()
         else:
             self.get_logger().error(f"Invalid movement name: {movement_name}")
