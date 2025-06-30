@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 import time
-from just1_utils.motor_control import (
+from just1_motors.utils_motors import (
     setup,
     stop_all,
     test_wheel,

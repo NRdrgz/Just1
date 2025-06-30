@@ -195,6 +195,9 @@ def generate_launch_description():
             {"gain": 0.1},
             {"zeta": 0.0},
         ],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
     ld.add_action(filter_imu_node)
 
@@ -206,6 +209,9 @@ def generate_launch_description():
         executable="scan_imu_sync",
         name="scan_imu_sync",
         output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
     ld.add_action(scan_imu_sync_node)
 
@@ -224,6 +230,9 @@ def generate_launch_description():
         # parent_frame: base_link (robot's base frame)
         # child_frame: imu_link (IMU's frame)
         arguments=["0.07", "0", "0", "3.1415", "0", "0", "base_link", "imu_link"],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
     ld.add_action(base_link_to_imu_tf_node)
 
@@ -254,6 +263,9 @@ def generate_launch_description():
             # Maximum angle for cropping (in degrees)
             {"angle_crop_max": 225.0},
         ],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
 
     # Static transform publisher to define the position and orientation of the LiDAR relative to the robot's base
@@ -271,6 +283,9 @@ def generate_launch_description():
         # parent_frame: base_link (robot's base frame)
         # child_frame: base_laser (LiDAR's frame)
         arguments=["0", "0", "0.12", "1.5708", "0", "0", "base_link", "base_laser"],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
 
     ld.add_action(ldlidar_node)
@@ -295,6 +310,9 @@ def generate_launch_description():
             ("/scan", "/scan/synced"),
         ],
         arguments=["--ros-args", "--log-level", "warn"],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
 
     ld.add_action(icp_odom_node)
@@ -322,6 +340,9 @@ def generate_launch_description():
             ("/scan", "/scan/synced"),
         ],
         arguments=["--ros-args", "--log-level", "warn"],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
 
     ld.add_action(rtabmap_slam_node)
@@ -353,6 +374,9 @@ def generate_launch_description():
                 ]
             },
         ],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
 
     # Loads and publishes the static occupancy grid map on the /map topic.
@@ -373,6 +397,9 @@ def generate_launch_description():
         name="planner_server",
         output="screen",
         parameters=[nav2_params],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
 
     # Converts the global path into velocity commands (on /cmd_vel) for real-time control.
@@ -382,6 +409,9 @@ def generate_launch_description():
         name="controller_server",
         output="screen",
         parameters=[nav2_params],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
 
     # Implements a behavior tree-based navigation system that combines path planning, obstacle avoidance, and recovery behaviors.
@@ -391,6 +421,9 @@ def generate_launch_description():
         name="bt_navigator",
         output="screen",
         parameters=[nav2_params],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
 
     # Manages the behavior tree (BT) for the robot’s navigation.
@@ -400,6 +433,9 @@ def generate_launch_description():
         name="behavior_server",
         output="screen",
         parameters=[nav2_params],
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'manual'"])
+        ),
     )
 
     ld.add_action(lifecycle_manager)
