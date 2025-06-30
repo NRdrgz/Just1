@@ -1,72 +1,126 @@
+# AMCL (Adaptive Monte Carlo Localization) parameters
 amcl: # Source https://github.com/ros-navigation/navigation2/blob/main/nav2_bringup/params/nav2_params.yaml
   ros__parameters:
+    # Noise parameter for rotation (forward motion)
     alpha1: 0.2
+    # Noise parameter for translation (forward motion)
     alpha2: 0.2
+    # Noise parameter for rotation (rotation motion)
     alpha3: 0.2
+    # Noise parameter for translation (rotation motion)
     alpha4: 0.2
+    # Noise parameter for translation (translation motion)
     alpha5: 0.2
+    # The frame attached to the robot base
     base_frame_id: "base_footprint"
+    # Distance for skipping beams in scan matching
     beam_skip_distance: 0.5
+    # Error threshold for skipping beams
     beam_skip_error_threshold: 0.9
+    # Threshold for skipping beams
     beam_skip_threshold: 0.3
+    # Enable or disable beam skipping
     do_beamskip: false
+    # The global reference frame
     global_frame_id: "map"
+    # Exponential decay parameter for short readings
     lambda_short: 0.1
+    # Maximum distance for likelihood field model
     laser_likelihood_max_dist: 2.0
+    # Maximum range of the laser
     laser_max_range: 100.0
+    # Minimum range of the laser
     laser_min_range: -1.0
+    # Type of laser model to use
     laser_model_type: "likelihood_field"
+    # Number of beams to use in scan matching
     max_beams: 60
+    # Maximum number of particles in the filter
     max_particles: 2000
+    # Minimum number of particles in the filter
     min_particles: 500
+    # The odometry frame
     odom_frame_id: "odom"
+    # Pose error tolerance
     pf_err: 0.05
+    # Pose error tolerance (z)
     pf_z: 0.99
+    # Fast recovery alpha
     recovery_alpha_fast: 0.0
+    # Slow recovery alpha
     recovery_alpha_slow: 0.0
+    # Interval for resampling particles
     resample_interval: 1
+    # Robot motion model type
     robot_model_type: "nav2_amcl::DifferentialMotionModel"
+    # Rate to save pose estimates
     save_pose_rate: 0.5
+    # Standard deviation for hit
     sigma_hit: 0.2
+    # Enable or disable TF broadcasting
     tf_broadcast: true
+    # Tolerance for TF transforms
     transform_tolerance: 1.0
+    # Enable or disable service introspection
     service_introspection_mode: "disabled"
+    # Minimum angular update
     update_min_a: 0.2
+    # Minimum distance update
     update_min_d: 0.25
+    # Weight for hit
     z_hit: 0.5
+    # Weight for max
     z_max: 0.05
+    # Weight for random
     z_rand: 0.5
+    # Weight for short
     z_short: 0.05
+    # Topic for laser scan
     scan_topic: scan
 
+# Behavior Tree Navigator parameters
 bt_navigator:
   ros__parameters:
+    # The global frame used for navigation
     global_frame: map
+    # The robot's base frame
     robot_base_frame: base_link
+    # Topic for odometry data
     odom_topic: odom
+    # Duration (ms) for each behavior tree loop
     bt_loop_duration: 10
+    # Duration (s) to filter BT outputs
     filter_duration: 0.3
+    # Timeout (s) for server responses
     default_server_timeout: 20
+    # Timeout (ms) to wait for services
     wait_for_service_timeout: 1000
+    # Enable or disable service introspection
     service_introspection_mode: "disabled"
+    # List of navigator plugins
     navigators: ["navigate_to_pose", "navigate_through_poses"]
+    # Parameters for the NavigateToPose behavior
     navigate_to_pose:
+      # Plugin name for NavigateToPose
       plugin: "nav2_bt_navigator::NavigateToPoseNavigator"
+      # Enable Groot monitoring for BT visualization
       enable_groot_monitoring: false
+      # Port for Groot server
       groot_server_port: 1667
+    # Parameters for the NavigateThroughPoses behavior
     navigate_through_poses:
+      # Plugin name for NavigateThroughPoses
       plugin: "nav2_bt_navigator::NavigateThroughPosesNavigator"
+      # Enable Groot monitoring for BT visualization
       enable_groot_monitoring: false
+      # Port for Groot server
       groot_server_port: 1669
-    # 'default_nav_through_poses_bt_xml' and 'default_nav_to_pose_bt_xml' are use defaults:
-    # nav2_bt_navigator/navigate_to_pose_w_replanning_and_recovery.xml
-    # nav2_bt_navigator/navigate_through_poses_w_replanning_and_recovery.xml
-    # They can be set here or via a RewrittenYaml remap from a parent launch file to Nav2.
-
-    # plugin_lib_names is used to add custom BT plugins to the executor (vector of strings).
+    # Default BT XML files for navigation behaviors (can be overridden)
+    # default_nav_through_poses_bt_xml and default_nav_to_pose_bt_xml are used by default
+    # plugin_lib_names is used to add custom BT plugins to the executor (vector of strings)
     # Built-in plugins are added automatically
     # plugin_lib_names: []
-
+    # List of error code name prefixes for BT actions
     error_code_name_prefixes:
       - assisted_teleop
       - backup
@@ -82,67 +136,119 @@ bt_navigator:
       - undock_robot
       - wait
 
+# Controller Server parameters
 controller_server:
   ros__parameters:
+    # Frequency (Hz) at which the controller runs
     controller_frequency: 10.0
+    # Timeout (seconds) for costmap updates before considering the update failed
     costmap_update_timeout: 0.30
+    # Minimum commanded x velocity (m/s) below which the controller will not send commands. Set above motor deadband to ensure movement.
     min_x_velocity_threshold: 0.25
+    # Minimum commanded y velocity (m/s) below which the controller will not send commands. Set above motor deadband to ensure movement (for holonomic robots).
     min_y_velocity_threshold: 0.25
+    # Minimum commanded angular velocity (rad/s) below which the controller will not send commands. Set above motor deadband to ensure rotation.
     min_theta_velocity_threshold: 0.1
+    # Allowed time (seconds) for the robot to not make progress before considering the goal unreachable
     failure_tolerance: 0.3
+    # List of progress checker plugins to use
     progress_checker_plugins: ["progress_checker"]
+    # List of goal checker plugins to use
     goal_checker_plugins: ["general_goal_checker"] # "precise_goal_checker"
+    # List of controller plugins to use
     controller_plugins: ["FollowPath"]
+    # Use real-time thread priority for the controller
     use_realtime_priority: false
+    # Topic for speed limit messages
     speed_limit_topic: "speed_limit"
-
-    # Progress checker parameters
+    # Progress checker plugin parameters
     progress_checker:
+      # Plugin type for progress checking
       plugin: "nav2_controller::SimpleProgressChecker"
+      # Minimum distance robot must move to be considered making progress (meters)
       required_movement_radius: 0.5
+      # Time (seconds) allowed without progress before failure
       movement_time_allowance: 10.0
-    # Goal checker parameters
+    # Goal checker plugin parameters
     #precise_goal_checker:
     #  plugin: "nav2_controller::SimpleGoalChecker"
     #  xy_goal_tolerance: 0.25
     #  yaw_goal_tolerance: 0.25
     #  stateful: True
     general_goal_checker:
+      # Whether to keep state between checks
       stateful: True
+      # Plugin type for goal checking
       plugin: "nav2_controller::SimpleGoalChecker"
+      # Allowed position error to consider goal reached (meters)
       xy_goal_tolerance: 0.25
+      # Allowed orientation error to consider goal reached (radians)
       yaw_goal_tolerance: 0.25
+    # FollowPath controller plugin parameters (MPPI Controller)
     FollowPath:
+      # Plugin type for path following
       plugin: "nav2_mppi_controller::MPPIController"
+      # Number of time steps in the trajectory
       time_steps: 56
+      # Time interval (seconds) between trajectory points
       model_dt: 0.1
+      # Number of sampled trajectories per iteration
       batch_size: 2000
-      ax_max: 3.0
-      ax_min: -3.0
-      ay_max: 3.0
-      ay_min: -3.0
-      az_max: 3.5
+      # Maximum linear acceleration in x (m/s^2)
+      ax_max: 2.0
+      # Minimum linear acceleration in x (m/s^2)
+      ax_min: -2.0
+      # Maximum linear acceleration in y (m/s^2)
+      ay_max: 2.0
+      # Minimum linear acceleration in y (m/s^2)
+      ay_min: -2.0
+      # Maximum angular acceleration (rad/s^2)
+      az_max: 1.0
+      # Standard deviation for velocity noise in x (m/s)
       vx_std: 0.2
+      # Standard deviation for velocity noise in y (m/s)
       vy_std: 0.2
+      # Standard deviation for velocity noise in angular (rad/s)
       wz_std: 0.4
-      vx_max: 0.5
-      vx_min: -0.5
-      vy_max: 0.5
+      # Maximum linear velocity in x (m/s)
+      vx_max: 1
+      # Minimum linear velocity in x (m/s)
+      vx_min: -1
+      # Maximum linear velocity in y (m/s)
+      vy_max: 1
+      # Minimum linear velocity in y (m/s)
+      vy_min: -1
+      # Maximum angular velocity (rad/s)
       wz_max: 1.9
+      # Number of optimization iterations per control cycle
       iteration_count: 1
+      # Distance (meters) to prune the path behind the robot
       prune_distance: 1.7
+      # TF transform tolerance (seconds)
       transform_tolerance: 0.1
+      # Temperature parameter for MPPI optimization (higher = more exploration)
       temperature: 0.3
+      # Discount factor for cost accumulation
       gamma: 0.015
-      motion_model: "DiffDrive"
+      # Motion model type ("Omni" for holonomic, "DiffDrive" for differential)
+      motion_model: "Omni"
+      # Enable visualization of sampled trajectories
       visualize: true
+      # Publish the optimal trajectory for visualization
       publish_optimal_trajectory: true
+      # Regenerate noise samples each iteration
       regenerate_noises: true
+      # Trajectory visualizer parameters
       TrajectoryVisualizer:
+        # Step between trajectory points to visualize
         trajectory_step: 5
+        # Time step between visualized points
         time_step: 3
+      # Ackermann constraints (for car-like robots)
       AckermannConstraints:
+        # Minimum turning radius (meters)
         min_turning_r: 0.2
+      # List of critic plugins to use for trajectory scoring
       critics:
         [
           "ConstraintCritic",
@@ -154,378 +260,629 @@ controller_server:
           "PathAngleCritic",
           "PreferForwardCritic",
         ]
+      # ConstraintCritic plugin parameters
       ConstraintCritic:
+        # Enable this critic
         enabled: true
+        # Power to raise the cost to
         cost_power: 1
+        # Weight for this critic
         cost_weight: 4.0
+      # GoalCritic plugin parameters
       GoalCritic:
         enabled: true
         cost_power: 1
         cost_weight: 5.0
+        # Distance threshold to consider for goal scoring
         threshold_to_consider: 1.4
+      # GoalAngleCritic plugin parameters
       GoalAngleCritic:
         enabled: true
         cost_power: 1
         cost_weight: 3.0
+        # Angle threshold to consider for goal angle scoring
         threshold_to_consider: 0.5
+      # PreferForwardCritic plugin parameters
       PreferForwardCritic:
         enabled: true
         cost_power: 1
         cost_weight: 5.0
+        # Distance threshold to consider for preferring forward motion
         threshold_to_consider: 0.5
+      # CostCritic plugin parameters
       CostCritic:
         enabled: true
         cost_power: 1
         cost_weight: 3.81
+        # Cost value for near collision
         near_collision_cost: 253
+        # Cost value for critical collision
         critical_cost: 300.0
+        # Whether to consider the robot's footprint in scoring
         consider_footprint: false
+        # Cost value for actual collision
         collision_cost: 1000000.0
+        # Distance to goal to consider as near goal
         near_goal_distance: 1.0
+        # Step between trajectory points for scoring
         trajectory_point_step: 2
+      # PathAlignCritic plugin parameters
       PathAlignCritic:
         enabled: true
         cost_power: 1
         cost_weight: 14.0
+        # Maximum ratio of path occupancy to consider
         max_path_occupancy_ratio: 0.05
+        # Step between trajectory points for scoring
         trajectory_point_step: 4
+        # Distance threshold to consider for path alignment
         threshold_to_consider: 0.5
+        # Offset from the furthest point on the path
         offset_from_furthest: 20
+        # Whether to use path orientations in scoring
         use_path_orientations: false
+      # PathFollowCritic plugin parameters
       PathFollowCritic:
         enabled: true
         cost_power: 1
         cost_weight: 5.0
+        # Offset from the furthest point on the path
         offset_from_furthest: 5
+        # Distance threshold to consider for path following
         threshold_to_consider: 1.4
+      # PathAngleCritic plugin parameters
       PathAngleCritic:
         enabled: true
         cost_power: 1
         cost_weight: 2.0
+        # Offset from the furthest point on the path
         offset_from_furthest: 4
+        # Angle threshold to consider for path angle scoring
         threshold_to_consider: 0.5
+        # Maximum angle to the furthest point
         max_angle_to_furthest: 1.0
+        # Mode for path angle critic (0 = default)
         mode: 0
+      # TwirlingCritic plugin parameters (commented out by default)
       # TwirlingCritic:
       #   enabled: true
       #   twirling_cost_power: 1
       #   twirling_cost_weight: 10.0
 
+# Local Costmap parameters
 local_costmap:
   local_costmap:
     ros__parameters:
+      # Frequency (Hz) to update the local costmap
       update_frequency: 5.0
+      # Frequency (Hz) to publish the local costmap
       publish_frequency: 2.0
+      # Global frame for the local costmap
       global_frame: odom
+      # Robot base frame for the local costmap
       robot_base_frame: base_link
+      # Whether to use a rolling window for the costmap
       rolling_window: true
+      # Width of the local costmap (meters)
       width: 3
+      # Height of the local costmap (meters)
       height: 3
+      # Resolution of the local costmap (meters/cell)
       resolution: 0.1
+      # Robot radius (meters) for inflation and obstacle avoidance
       robot_radius: 0.22
+      # List of costmap layer plugins
       plugins: ["voxel_layer", "inflation_layer"]
+      # Inflation layer parameters
       inflation_layer:
+        # Plugin type for inflation
         plugin: "nav2_costmap_2d::InflationLayer"
+        # Scaling factor for inflation cost
         cost_scaling_factor: 3.0
-        inflation_radius: 0.70
+        # Radius (meters) to inflate obstacles
+        inflation_radius: 0.1
+      # Voxel layer parameters (3D obstacle representation)
       voxel_layer:
+        # Plugin type for voxel layer
         plugin: "nav2_costmap_2d::VoxelLayer"
+        # Enable or disable the voxel layer
         enabled: True
+        # Publish the voxel map for visualization
         publish_voxel_map: True
+        # Z origin of the voxel grid (meters)
         origin_z: 0.0
+        # Z resolution of the voxel grid (meters/cell)
         z_resolution: 0.05
+        # Number of voxels in the z direction
         z_voxels: 16
+        # Maximum obstacle height (meters)
         max_obstacle_height: 2.0
+        # Minimum number of marked cells to consider an obstacle
         mark_threshold: 0
+        # List of observation sources for obstacles
         observation_sources: scan
         scan:
-          # A relative topic will be appended to the parent of the local_costmap namespace.
-          # For example:
-          #   * User chosen namespace is `tb4`.
-          #   * User chosen topic is `scan`.
-          #   * Topic will be remapped to `/tb4/scan` without `local_costmap`.
-          #   * Use global topic `/scan` if you do not wish the node namespace to apply
+          # Topic for laser scan data
           topic: scan
+          # Maximum obstacle height (meters) for scan
           max_obstacle_height: 2.0
+          # Enable clearing obstacles with scan
           clearing: True
+          # Enable marking obstacles with scan
           marking: True
+          # Data type for scan (LaserScan, PointCloud, etc.)
           data_type: "LaserScan"
+          # Maximum range for raytracing (meters)
           raytrace_max_range: 3.0
+          # Minimum range for raytracing (meters)
           raytrace_min_range: 0.0
+          # Maximum range for obstacle detection (meters)
           obstacle_max_range: 2.5
+          # Minimum range for obstacle detection (meters)
           obstacle_min_range: 0.0
+      # Static layer parameters
       static_layer:
+        # Plugin type for static layer
         plugin: "nav2_costmap_2d::StaticLayer"
+        # Use transient local subscription for map
         map_subscribe_transient_local: True
+      # Always send the full costmap on updates
       always_send_full_costmap: True
+      # Enable or disable service introspection
       service_introspection_mode: "disabled"
 
+# Global Costmap parameters
 global_costmap:
   global_costmap:
     ros__parameters:
+      # Frequency (Hz) to update the global costmap
       update_frequency: 1.0
+      # Frequency (Hz) to publish the global costmap
       publish_frequency: 1.0
+      # Global frame for the global costmap
       global_frame: map
+      # Robot base frame for the global costmap
       robot_base_frame: base_link
+      # Robot radius (meters) for inflation and obstacle avoidance
       robot_radius: 0.22
+      # Resolution of the global costmap (meters/cell)
       resolution: 0.1
+      # Whether to track unknown space in the costmap
       track_unknown_space: true
+      # List of costmap layer plugins
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      # Obstacle layer parameters
       obstacle_layer:
+        # Plugin type for obstacle layer
         plugin: "nav2_costmap_2d::ObstacleLayer"
+        # Enable or disable the obstacle layer
         enabled: True
+        # List of observation sources for obstacles
         observation_sources: scan
         scan:
-          # A relative topic will be appended to the parent of the global_costmap namespace.
-          # For example:
-          #   * User chosen namespace is `tb4`.
-          #   * User chosen topic is `scan`.
-          #   * Topic will be remapped to `/tb4/scan` without `global_costmap`.
-          #   * Use global topic `/scan` if you do not wish the node namespace to apply
+          # Topic for laser scan data
           topic: scan
+          # Maximum obstacle height (meters) for scan
           max_obstacle_height: 2.0
+          # Enable clearing obstacles with scan
           clearing: True
+          # Enable marking obstacles with scan
           marking: True
+          # Data type for scan (LaserScan, PointCloud, etc.)
           data_type: "LaserScan"
+          # Maximum range for raytracing (meters)
           raytrace_max_range: 3.0
+          # Minimum range for raytracing (meters)
           raytrace_min_range: 0.0
+          # Maximum range for obstacle detection (meters)
           obstacle_max_range: 2.5
+          # Minimum range for obstacle detection (meters)
           obstacle_min_range: 0.0
+      # Static layer parameters
       static_layer:
+        # Plugin type for static layer
         plugin: "nav2_costmap_2d::StaticLayer"
+        # Use transient local subscription for map
         map_subscribe_transient_local: True
+      # Inflation layer parameters
       inflation_layer:
+        # Plugin type for inflation
         plugin: "nav2_costmap_2d::InflationLayer"
+        # Scaling factor for inflation cost
         cost_scaling_factor: 3.0
+        # Radius (meters) to inflate obstacles
         inflation_radius: 0.7
+      # Always send the full costmap on updates
       always_send_full_costmap: True
+      # Enable or disable service introspection
       service_introspection_mode: "disabled"
 
-# The yaml_filename does not need to be specified since it going to be set by defaults in launch.
-# If you'd rather set it in the yaml, remove the default "map" value in the launch file(s).
-# file & provide full path to map below. If CLI map configuration or launch default is provided, that will be used.
+# Map Server parameters
 map_server:
   ros__parameters:
+    # (Optional) Path to the map YAML file
     # yaml_filename: ""
+    # Enable or disable service introspection
     service_introspection_mode: "disabled"
 
+# Map Saver parameters
 map_saver:
   ros__parameters:
+    # Timeout (seconds) for saving the map
     save_map_timeout: 5.0
+    # Default threshold for free space
     free_thresh_default: 0.25
+    # Default threshold for occupied space
     occupied_thresh_default: 0.65
+    # Use transient local subscription for map
     map_subscribe_transient_local: True
+    # Enable or disable service introspection
     service_introspection_mode: "disabled"
 
+# Planner Server parameters
 planner_server:
   ros__parameters:
+    # Expected frequency (Hz) for planner updates
     expected_planner_frequency: 10.0
+    # List of planner plugins to use
     planner_plugins: ["GridBased"]
+    # Timeout (seconds) for costmap updates before considering the update failed
     costmap_update_timeout: 1.0
+    # Enable or disable service introspection
     service_introspection_mode: "disabled"
+    # GridBased planner plugin parameters
     GridBased:
+      # Plugin type for grid-based planning
       plugin: "nav2_navfn_planner::NavfnPlanner"
+      # Allowed tolerance (meters) for the goal
       tolerance: 1.0
+      # Use A* search algorithm (false = Dijkstra)
       use_astar: false
+      # Allow planning through unknown space
       allow_unknown: true
 
+# Smoother Server parameters
 smoother_server:
   ros__parameters:
+    # List of smoother plugins to use
     smoother_plugins: ["simple_smoother", "route_smoother"]
+    # Simple smoother plugin parameters
     simple_smoother:
+      # Plugin type for simple smoothing
       plugin: "nav2_smoother::SimpleSmoother"
+      # Allowed tolerance for smoothing
       tolerance: 1.0e-10
+      # Maximum number of iterations for smoothing
       max_its: 1000
+      # Number of refinement steps
       refinement_num: 2
-      # True for Hybrid A* or State Lattice to not smooth over directional changes
+      # Enforce path inversion for hybrid A* or state lattice planners
       enforce_path_inversion: True
+      # Perform additional refinement
       do_refinement: True
+    # Route smoother plugin parameters
     route_smoother:
+      # Plugin type for route smoothing
       plugin: "nav2_smoother::SimpleSmoother"
+      # Allowed tolerance for smoothing
       tolerance: 1.0e-10
+      # Maximum number of iterations for smoothing
       max_its: 1000
+      # Number of refinement steps
       refinement_num: 5
-      # False for Route Server or others where smoothing out sharp corners is OK
+      # Do not enforce path inversion for route smoothing
       enforce_path_inversion: False
+      # Perform additional refinement
       do_refinement: True
 
+# Behavior Server parameters
 behavior_server:
   ros__parameters:
+    # Topic for the local costmap
     local_costmap_topic: local_costmap/costmap_raw
+    # Topic for the global costmap
     global_costmap_topic: global_costmap/costmap_raw
+    # Topic for the local footprint
     local_footprint_topic: local_costmap/published_footprint
+    # Topic for the global footprint
     global_footprint_topic: global_costmap/published_footprint
+    # Frequency (Hz) to run behavior server cycles
     cycle_frequency: 10.0
+    # List of behavior plugins to use
     behavior_plugins:
       ["spin", "backup", "drive_on_heading", "assisted_teleop", "wait"]
+    # Spin behavior plugin parameters
     spin:
+      # Plugin type for spin behavior
       plugin: "nav2_behaviors::Spin"
+    # Backup behavior plugin parameters
     backup:
+      # Plugin type for backup behavior
       plugin: "nav2_behaviors::BackUp"
+      # Maximum acceleration (m/s^2) for backup
       acceleration_limit: 2.5
+      # Maximum deceleration (m/s^2) for backup
       deceleration_limit: -2.5
+      # Minimum speed (m/s) for backup
       minimum_speed: 0.10
+    # Drive on heading behavior plugin parameters
     drive_on_heading:
+      # Plugin type for drive on heading behavior
       plugin: "nav2_behaviors::DriveOnHeading"
+      # Maximum acceleration (m/s^2) for drive on heading
       acceleration_limit: 2.5
+      # Maximum deceleration (m/s^2) for drive on heading
       deceleration_limit: -2.5
+      # Minimum speed (m/s) for drive on heading
       minimum_speed: 0.10
+    # Wait behavior plugin parameters
     wait:
+      # Plugin type for wait behavior
       plugin: "nav2_behaviors::Wait"
+    # Assisted teleop behavior plugin parameters
     assisted_teleop:
+      # Plugin type for assisted teleop behavior
       plugin: "nav2_behaviors::AssistedTeleop"
+    # Local frame for behaviors
     local_frame: odom
+    # Global frame for behaviors
     global_frame: map
+    # Robot base frame for behaviors
     robot_base_frame: base_link
+    # TF transform tolerance (seconds)
     transform_tolerance: 0.5
+    # Time (seconds) to simulate ahead for behaviors
     simulate_ahead_time: 2.0
+    # Maximum rotational velocity (rad/s)
     max_rotational_vel: 1.0
+    # Minimum rotational velocity (rad/s)
     min_rotational_vel: 0.4
+    # Maximum rotational acceleration (rad/s^2)
     rotational_acc_lim: 3.2
 
+# Waypoint Follower parameters
 waypoint_follower:
   ros__parameters:
+    # Frequency (Hz) to run the waypoint follower loop
     loop_rate: 20
+    # Whether to stop on failure to reach a waypoint
     stop_on_failure: false
+    # Enable or disable service introspection
     service_introspection_mode: "disabled"
+    # Plugin for executing tasks at waypoints
     waypoint_task_executor_plugin: "wait_at_waypoint"
+    # Wait at waypoint plugin parameters
     wait_at_waypoint:
+      # Plugin type for waiting at waypoints
       plugin: "nav2_waypoint_follower::WaitAtWaypoint"
+      # Enable or disable waiting at waypoints
       enabled: True
+      # Duration (ms) to pause at each waypoint
       waypoint_pause_duration: 200
 
+# Route Server parameters
 route_server:
   ros__parameters:
-    # The graph_filepath does not need to be specified since it going to be set by defaults in launch.
-    # If you'd rather set it in the yaml, remove the default "graph" value in the launch file(s).
-    # file & provide full path to map below. If graph config or launch default is provided, it is used
+    # (Optional) Path to the graph file for route planning
     # graph_filepath: $(find-pkg-share nav2_route)/graphs/aws_graph.geojson
+    # Radius (meters) to achieve a node boundary
     boundary_radius_to_achieve_node: 1.0
+    # Radius (meters) to achieve a node
     radius_to_achieve_node: 2.0
+    # Whether to smooth corners in the route
     smooth_corners: true
+    # List of operations plugins to use
     operations: ["AdjustSpeedLimit", "ReroutingService", "CollisionMonitor"]
+    # Rerouting service plugin parameters
     ReroutingService:
+      # Plugin type for rerouting
       plugin: "nav2_route::ReroutingService"
+    # Adjust speed limit plugin parameters
     AdjustSpeedLimit:
+      # Plugin type for adjusting speed limit
       plugin: "nav2_route::AdjustSpeedLimit"
+    # Collision monitor plugin parameters
     CollisionMonitor:
+      # Plugin type for collision monitoring
       plugin: "nav2_route::CollisionMonitor"
+      # Maximum distance (meters) to consider for collision
       max_collision_dist: 3.0
+    # List of edge cost function plugins
     edge_cost_functions: ["DistanceScorer", "CostmapScorer"]
+    # Distance scorer plugin parameters
     DistanceScorer:
+      # Plugin type for distance scoring
       plugin: "nav2_route::DistanceScorer"
+    # Costmap scorer plugin parameters
     CostmapScorer:
+      # Plugin type for costmap scoring
       plugin: "nav2_route::CostmapScorer"
 
+# Velocity Smoother parameters
 velocity_smoother:
   ros__parameters:
+    # Frequency (Hz) at which the velocity smoother runs
     smoothing_frequency: 20.0
+    # Whether to scale velocities to the maximum allowed
     scale_velocities: False
+    # Feedback mode for velocity smoothing (OPEN_LOOP or CLOSED_LOOP)
     feedback: "OPEN_LOOP"
-    max_velocity: [0.5, 0.0, 2.0]
-    min_velocity: [-0.5, 0.0, -2.0]
-    max_accel: [2.5, 0.0, 3.2]
-    max_decel: [-2.5, 0.0, -3.2]
+    # Maximum allowed velocity [x, y, angular] (m/s, m/s, rad/s). Limits the speed of the robot in each direction.
+    max_velocity: [0.5, 0.5, 2.0]
+    # Minimum allowed velocity [x, y, angular] (m/s, m/s, rad/s). Limits the speed of the robot in each direction (negative for reverse/left).
+    min_velocity: [-0.5, -0.5, -2.0]
+    # Maximum allowed acceleration [x, y, angular] (m/s^2, m/s^2, rad/s^2). Limits how quickly the robot can speed up.
+    max_accel: [1.0, 1.0, 1.0]
+    # Maximum allowed deceleration [x, y, angular] (m/s^2, m/s^2, rad/s^2). Limits how quickly the robot can slow down (negative values).
+    max_decel: [-1.0, -1.0, -1.0]
+    # Topic for odometry messages
     odom_topic: "odom"
+    # Duration (seconds) to use odometry data for smoothing
     odom_duration: 0.1
+    # Deadband velocities [x, y, angular] below which commands are set to zero
     deadband_velocity: [0.0, 0.0, 0.0]
+    # Timeout (seconds) for velocity commands before stopping the robot
     velocity_timeout: 1.0
 
+# Collision Monitor parameters
 collision_monitor:
   ros__parameters:
+    # Base frame for collision monitoring
     base_frame_id: "base_footprint"
+    # Odometry frame for collision monitoring
     odom_frame_id: "odom"
+    # Input topic for smoothed velocity commands
     cmd_vel_in_topic: "cmd_vel_smoothed"
+    # Output topic for collision-checked velocity commands
     cmd_vel_out_topic: "cmd_vel"
+    # Topic for publishing collision monitor state
     state_topic: "collision_monitor_state"
+    # TF transform tolerance (seconds)
     transform_tolerance: 0.2
+    # Timeout (seconds) for sensor sources
     source_timeout: 1.0
+    # Enable base shift correction for collision monitoring
     base_shift_correction: True
+    # Timeout (seconds) for publishing stop commands
     stop_pub_timeout: 2.0
-    # Polygons represent zone around the robot for "stop", "slowdown" and "limit" action types,
-    # and robot footprint for "approach" action type.
+    # List of polygons for collision actions
     polygons: ["FootprintApproach"]
+    # Footprint approach polygon parameters
     FootprintApproach:
+      # Type of polygon (e.g., "polygon")
       type: "polygon"
+      # Action type for this polygon (e.g., "approach")
       action_type: "approach"
+      # Topic for robot footprint
       footprint_topic: "local_costmap/published_footprint"
+      # Time (seconds) before collision to trigger action
       time_before_collision: 1.2
+      # Time step (seconds) for collision simulation
       simulation_time_step: 0.1
+      # Minimum number of points in the polygon
       min_points: 6
+      # Enable or disable visualization of the polygon
       visualize: False
+      # Enable or disable this polygon
       enabled: True
+    # List of observation sources for collision monitoring
     observation_sources: ["scan"]
     scan:
+      # Type of observation source (e.g., "scan")
       type: "scan"
+      # Topic for scan data
       topic: "scan"
+      # Minimum height (meters) for scan data
       min_height: 0.15
+      # Maximum height (meters) for scan data
       max_height: 2.0
+      # Enable or disable this scan source
       enabled: True
 
+# Docking Server parameters
 docking_server:
   ros__parameters:
+    # Frequency (Hz) for the docking controller
     controller_frequency: 10
+    # Timeout (seconds) for initial perception
     initial_perception_timeout: 5.0
+    # Timeout (seconds) to wait for charging
     wait_charge_timeout: 5.0
+    # Timeout (seconds) for dock approach
     dock_approach_timeout: 30.0
+    # Allowed linear tolerance (meters) for undocking
     undock_linear_tolerance: 0.05
+    # Allowed angular tolerance (radians) for undocking
     undock_angular_tolerance: 0.1
+    # Maximum number of retries for docking
     max_retries: 3
+    # Robot base frame for docking
     base_frame: "base_link"
+    # Fixed frame for docking
     fixed_frame: "odom"
+    # Tolerance (meters) for dock prestaging
     dock_prestaging_tolerance: 0.5
+    # Enable or disable service introspection
     service_introspection_mode: "disabled"
-
-    # Types of docks
+    # List of dock plugin types
     dock_plugins: ["simple_charging_dock"]
+    # Simple charging dock plugin parameters
     simple_charging_dock:
+      # Plugin type for simple charging dock
       plugin: "opennav_docking::SimpleChargingDock"
+      # Threshold (meters) for successful docking
       docking_threshold: 0.05
+      # X offset (meters) for dock staging
       staging_x_offset: -0.7
+      # Use external detection pose for docking
       use_external_detection_pose: true
+      # Use battery status for docking
       use_battery_status: false # true
+      # Use stall detection for docking
       use_stall_detection: false # true
+      # Docking direction (e.g., "forward")
       dock_direction: "forward"
-
+      # Timeout (seconds) for external detection
       external_detection_timeout: 1.0
+      # External detection translation in x (meters)
       external_detection_translation_x: -0.18
+      # External detection translation in y (meters)
       external_detection_translation_y: 0.0
+      # External detection rotation in roll (radians)
       external_detection_rotation_roll: -1.57
+      # External detection rotation in pitch (radians)
       external_detection_rotation_pitch: -1.57
+      # External detection rotation in yaw (radians)
       external_detection_rotation_yaw: 0.0
+      # Filter coefficient for detection
       filter_coef: 0.1
-
-    # Dock instances
-    # The following example illustrates configuring dock instances.
-    # docks: ['home_dock']  # Input your docks here
-    # home_dock:
-    #   type: 'simple_charging_dock'
-    #   frame: map
-    #   pose: [0.0, 0.0, 0.0]
-
+    # Dock controller parameters
     controller:
+      # Proportional gain for heading error
       k_phi: 3.0
+      # Proportional gain for lateral error
       k_delta: 2.0
+      # Minimum linear velocity (m/s) for docking
       v_linear_min: 0.15
+      # Maximum linear velocity (m/s) for docking
       v_linear_max: 0.15
+      # Enable collision detection during docking
       use_collision_detection: true
+      # Topic for costmap data
       costmap_topic: "local_costmap/costmap_raw"
+      # Topic for robot footprint
       footprint_topic: "local_costmap/published_footprint"
+      # TF transform tolerance (seconds)
       transform_tolerance: 0.1
+      # Time (seconds) to project docking trajectory
       projection_time: 5.0
+      # Time step (seconds) for docking simulation
       simulation_step: 0.1
+      # Threshold (meters) for dock collision
       dock_collision_threshold: 0.3
 
+# Loopback Simulator parameters
 loopback_simulator:
   ros__parameters:
+    # Base frame for the simulator
     base_frame_id: "base_footprint"
+    # Odometry frame for the simulator
     odom_frame_id: "odom"
+    # Map frame for the simulator
     map_frame_id: "map"
+    # Scan frame for the simulator
     scan_frame_id: "base_scan" # tb4_loopback_simulator.launch.py remaps to 'rplidar_link'
+    # Duration (seconds) between simulator updates
     update_duration: 0.02
+    # Minimum scan range (meters)
     scan_range_min: 0.05
+    # Maximum scan range (meters)
     scan_range_max: 30.0
+    # Minimum scan angle (radians)
     scan_angle_min: -3.1415
+    # Maximum scan angle (radians)
     scan_angle_max: 3.1415
+    # Scan angle increment (radians)
     scan_angle_increment: 0.02617
+    # Whether to use infinite values for out-of-range scans
     scan_use_inf: true
