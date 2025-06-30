@@ -133,7 +133,7 @@ class AutonomousMotorController(Node):
             percentage = int((rpm / max_rpm) * 100)
 
             # If the absolute value of the percentage is less than the minimum absolute percentage, set it to the minimum absolute percentage
-            if abs(percentage) < min_absolute_percentage and percentage > 0:
+            if abs(percentage) < min_absolute_percentage and abs(percentage) >= 0:
                 percentage = min_absolute_percentage * (percentage / abs(percentage))
 
             # Control the wheel
