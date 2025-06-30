@@ -445,4 +445,16 @@ def generate_launch_description():
     ld.add_action(bt_navigator)
     ld.add_action(behavior_server)
 
+    # Autonomous motor controller node
+    autonomous_motor_controller_node = Node(
+        package="just1_motors",
+        executable="autonomous_controller_node",
+        name="autonomous_motor_controller",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration("mode"), "' == 'autonomous'"])
+        ),
+    )
+    ld.add_action(autonomous_motor_controller_node)
+
     return ld
