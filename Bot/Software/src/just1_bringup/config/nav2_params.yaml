@@ -171,6 +171,8 @@ controller_server:
     vy_min: -1.0
     # Maximum angular velocity (rad/s)
     wz_max: 1.9
+    # Check for collisions
+    check_for_collisions: true
     # List of progress checker plugins to use
     progress_checker_plugins: ["progress_checker"]
     # List of goal checker plugins to use
@@ -289,7 +291,7 @@ controller_server:
         # Cost value for critical collision
         critical_cost: 300.0
         # Whether to consider the robot's footprint in scoring
-        consider_footprint: false
+        consider_footprint: true
         # Cost value for actual collision
         collision_cost: 1000000.0
         # Distance to goal to consider as near goal
