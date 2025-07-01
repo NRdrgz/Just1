@@ -291,7 +291,7 @@ controller_server:
         # Cost value for critical collision
         critical_cost: 300.0
         # Whether to consider the robot's footprint in scoring
-        consider_footprint: true
+        consider_footprint: false
         # Cost value for actual collision
         collision_cost: 1000000.0
         # Distance to goal to consider as near goal
