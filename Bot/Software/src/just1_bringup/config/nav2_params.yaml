@@ -142,9 +142,9 @@ controller_server:
     # Frequency (Hz) at which the controller runs
     controller_frequency: 10.0
     # Timeout (seconds) for costmap updates before considering the update failed
-    costmap_update_timeout: 3
+    costmap_update_timeout: 3.0
     # Allowed time (seconds) for the robot to not make progress before considering the goal unreachable
-    failure_tolerance: 3
+    failure_tolerance: 3.0
     # Maximum linear acceleration in x (m/s^2)
     ax_max: 2.0
     # Minimum linear acceleration in x (m/s^2)
