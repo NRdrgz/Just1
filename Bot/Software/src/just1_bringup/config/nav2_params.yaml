@@ -60,7 +60,7 @@ amcl: # Source https://github.com/ros-navigation/navigation2/blob/main/nav2_brin
     # Enable or disable TF broadcasting
     tf_broadcast: true
     # Tolerance for TF transforms
-    transform_tolerance: 1.0
+    transform_tolerance: 2.0
     # Enable or disable service introspection
     service_introspection_mode: "disabled"
     # Minimum angular update
@@ -219,7 +219,7 @@ controller_server:
       # Distance (meters) to prune the path behind the robot
       prune_distance: 1.7
       # TF transform tolerance (seconds)
-      transform_tolerance: 0.1
+      transform_tolerance: 2.0
       # Temperature parameter for MPPI optimization (higher = more exploration)
       temperature: 0.3
       # Discount factor for cost accumulation
@@ -620,7 +620,7 @@ behavior_server:
     # Robot base frame for behaviors
     robot_base_frame: base_link
     # TF transform tolerance (seconds)
-    transform_tolerance: 0.5
+    transform_tolerance: 2.0
     # Time (seconds) to simulate ahead for behaviors
     simulate_ahead_time: 2.0
     # Maximum rotational velocity (rad/s)
@@ -703,7 +703,7 @@ collision_monitor:
     # Topic for publishing collision monitor state
     state_topic: "collision_monitor_state"
     # TF transform tolerance (seconds)
-    transform_tolerance: 0.2
+    transform_tolerance: 2.0
     # Timeout (seconds) for sensor sources
     source_timeout: 1.0
     # Enable base shift correction for collision monitoring
@@ -818,7 +818,7 @@ docking_server:
       # Topic for robot footprint
       footprint_topic: "local_costmap/published_footprint"
       # TF transform tolerance (seconds)
-      transform_tolerance: 0.1
+      transform_tolerance: 2.0
       # Time (seconds) to project docking trajectory
       projection_time: 5.0
       # Time step (seconds) for docking simulation
