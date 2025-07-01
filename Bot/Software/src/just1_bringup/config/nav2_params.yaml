@@ -212,10 +212,6 @@ controller_server:
         trajectory_step: 5
         # Time step between visualized points
         time_step: 3
-      # Ackermann constraints (for car-like robots)
-      AckermannConstraints:
-        # Minimum turning radius (meters)
-        min_turning_r: 0.1
       # List of critic plugins to use for trajectory scoring
       critics:
         [
@@ -348,7 +344,7 @@ local_costmap:
         # Scaling factor for inflation cost
         cost_scaling_factor: 3.0
         # Radius (meters) to inflate obstacles
-        inflation_radius: 0.225
+        inflation_radius: 0.09
       # Voxel layer parameters (3D obstacle representation)
       voxel_layer:
         # Plugin type for voxel layer
