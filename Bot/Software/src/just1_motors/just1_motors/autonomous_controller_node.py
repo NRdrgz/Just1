@@ -42,40 +42,89 @@ class AutonomousMotorController(Node):
     def cmd_vel_callback(self, msg):
         """
         Callback function for cmd_vel messages.
-        Converts linear and angular velocities to normalized wheel speeds for mecanum drive and publishes them.
+        Converts linear and angular velocities to wheel speeds for mecanum drive.
         """
         # Extract velocities
         linear_x = msg.linear.x
         linear_y = msg.linear.y
         angular_z = msg.angular.z
 
-        # Robot parameters
+        # Calculate wheel speeds for mecanum drive
+        wheel_speeds = self.calculate_mecanum_wheel_speeds(
+            linear_x, linear_y, angular_z
+        )
+
+        # Publish wheel speeds
+        wheel_speeds_msg = WheelSpeeds()
+        wheel_speeds_msg.front_left = wheel_speeds["front_left"]
+        wheel_speeds_msg.front_right = wheel_speeds["front_right"]
+        wheel_speeds_msg.back_left = wheel_speeds["back_left"]
+        wheel_speeds_msg.back_right = wheel_speeds["back_right"]
+
+        self.wheel_speeds_publisher.publish(wheel_speeds_msg)
+
+        # Control motors
+        self.control_motors(wheel_speeds)
+
+    def calculate_mecanum_wheel_speeds(self, linear_x, linear_y, angular_z):
+        """
+        Calculate wheel speeds for mecanum drive based on desired velocities.
+
+        Args:
+            linear_x: Forward/backward velocity (m/s)
+            linear_y: Left/right velocity (m/s)
+            angular_z: Rotational velocity (rad/s)
+
+        Returns:
+            dict: Wheel speeds for each wheel
+        """
+        # Mecanum wheel speed equations
+        # Front left: vx - vy - (Lx + Ly) * ω
+        # Front right: vx + vy + (Lx + Ly) * ω
+        # Back left: vx + vy - (Lx + Ly) * ω
+        # Back right: vx - vy + (Lx + Ly) * ω
+
         Lx = self.wheel_separation_x / 2.0
         Ly = self.wheel_separation_y / 2.0
-        wheel_radius = self.wheel_radius
-        max_rpm = 123
-        min_effective_percent = 50
 
-        # Mecanum wheel speed equations
         front_left = linear_x - linear_y - (Lx + Ly) * angular_z
         front_right = linear_x + linear_y + (Lx + Ly) * angular_z
         back_left = linear_x + linear_y - (Lx + Ly) * angular_z
         back_right = linear_x - linear_y + (Lx + Ly) * angular_z
 
         # Convert from m/s to RPM (approximate)
-        rpm_factor = 60.0 / (2.0 * math.pi * wheel_radius)
-        wheel_rpms = {
+        # RPM = (m/s) / (2 * π * radius) * 60
+        rpm_factor = 60.0 / (2.0 * math.pi * self.wheel_radius)
+
+        wheel_speeds = {
             "front_left": front_left * rpm_factor,
             "front_right": front_right * rpm_factor,
             "back_left": back_left * rpm_factor,
             "back_right": back_right * rpm_factor,
         }
 
-        # Normalize RPM to percentage between 50 and 100 (or -50 and -100)
-        wheel_percentages = {}
-        for wheel_name, rpm in wheel_rpms.items():
+        return wheel_speeds
+
+    def control_motors(self, wheel_speeds):
+        """
+        Control motors based on calculated wheel speeds.
+
+        Args:
+            wheel_speeds: dict containing speeds for each wheel
+        """
+        # Convert RPM to percentage (-100 to 100)
+        # Max forward speed is 0.5 m/s so max RPM is 123
+        max_rpm = 123
+        min_effective_percent = 50
+
+        for wheel_name, rpm in wheel_speeds.items():
+            # Clamp RPM to max_rpm
             rpm = max(-max_rpm, min(max_rpm, rpm))
+
+            # Convert to percentage
             percentage = int((rpm / max_rpm) * 100)
+
+            # Normalize percentage to be between 50 and 100 (or -50 and -100) when not zero
             if percentage > 0:
                 percentage = int(
                     min_effective_percent + (percentage / 100) * min_effective_percent
@@ -85,17 +134,9 @@ class AutonomousMotorController(Node):
                     -min_effective_percent + (percentage / 100) * min_effective_percent
                 )
             # If percentage is 0, keep it as 0
-            wheel_percentages[wheel_name] = percentage
+
             # Control the wheel
             control_wheel(wheel_name, percentage)
-
-        # Publish normalized wheel speeds
-        wheel_speeds_msg = WheelSpeeds()
-        wheel_speeds_msg.front_left = wheel_percentages["front_left"]
-        wheel_speeds_msg.front_right = wheel_percentages["front_right"]
-        wheel_speeds_msg.back_left = wheel_percentages["back_left"]
-        wheel_speeds_msg.back_right = wheel_percentages["back_right"]
-        self.wheel_speeds_publisher.publish(wheel_speeds_msg)
 
     def on_shutdown(self):
         """
