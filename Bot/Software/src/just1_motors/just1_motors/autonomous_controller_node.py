@@ -37,11 +37,6 @@ class AutonomousMotorController(Node):
             WheelSpeeds, "wheel_speeds", 10
         )
 
-        # Create timer for safety timeout
-        self.last_cmd_time = self.get_clock().now()
-        self.cmd_timeout = 0.5  # seconds
-        self.safety_timer = self.create_timer(0.1, self.safety_check)
-
         self.get_logger().info("Autonomous Motor Controller initialized")
 
     def cmd_vel_callback(self, msg):
@@ -49,9 +44,6 @@ class AutonomousMotorController(Node):
         Callback function for cmd_vel messages.
         Converts linear and angular velocities to wheel speeds for mecanum drive.
         """
-        # Update last command time
-        self.last_cmd_time = self.get_clock().now()
-
         # Extract velocities
         linear_x = msg.linear.x
         linear_y = msg.linear.y
@@ -132,25 +124,19 @@ class AutonomousMotorController(Node):
             # Convert to percentage
             percentage = int((rpm / max_rpm) * 100)
 
-            # Apply minimum effective percentage
-            if percentage > 0 and percentage < min_effective_percent:
-                percentage = min_effective_percent
-            elif percentage < 0 and percentage > -min_effective_percent:
-                percentage = -min_effective_percent
+            # Normalize percentage to be between 50 and 100 (or -50 and -100) when not zero
+            if percentage > 0:
+                percentage = int(
+                    min_effective_percent + (percentage / 100) * min_effective_percent
+                )
+            elif percentage < 0:
+                percentage = int(
+                    -min_effective_percent + (percentage / 100) * min_effective_percent
+                )
+            # If percentage is 0, keep it as 0
 
             # Control the wheel
             control_wheel(wheel_name, percentage)
-
-    def safety_check(self):
-        """
-        Safety check to stop motors if no commands received for a while.
-        """
-        current_time = self.get_clock().now()
-        time_since_last_cmd = (current_time - self.last_cmd_time).nanoseconds / 1e9
-
-        if time_since_last_cmd > self.cmd_timeout:
-            # Stop all motors if no command received
-            stop_all()
 
     def on_shutdown(self):
         """
