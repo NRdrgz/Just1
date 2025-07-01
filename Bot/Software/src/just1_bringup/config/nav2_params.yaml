@@ -142,15 +142,9 @@ controller_server:
     # Frequency (Hz) at which the controller runs
     controller_frequency: 10.0
     # Timeout (seconds) for costmap updates before considering the update failed
-    costmap_update_timeout: 0.30
-    # Minimum commanded x velocity (m/s) below which the controller will not send commands. Set above motor deadband to ensure movement.
-    min_x_velocity_threshold: 0.25
-    # Minimum commanded y velocity (m/s) below which the controller will not send commands. Set above motor deadband to ensure movement (for holonomic robots).
-    min_y_velocity_threshold: 0.25
-    # Minimum commanded angular velocity (rad/s) below which the controller will not send commands. Set above motor deadband to ensure rotation.
-    min_theta_velocity_threshold: 0.1
+    costmap_update_timeout: 3
     # Allowed time (seconds) for the robot to not make progress before considering the goal unreachable
-    failure_tolerance: 0.3
+    failure_tolerance: 3
     # List of progress checker plugins to use
     progress_checker_plugins: ["progress_checker"]
     # List of goal checker plugins to use
@@ -181,9 +175,9 @@ controller_server:
       # Plugin type for goal checking
       plugin: "nav2_controller::SimpleGoalChecker"
       # Allowed position error to consider goal reached (meters)
-      xy_goal_tolerance: 0.25
+      xy_goal_tolerance: 0.1
       # Allowed orientation error to consider goal reached (radians)
-      yaw_goal_tolerance: 0.25
+      yaw_goal_tolerance: 0.1
     # FollowPath controller plugin parameters (MPPI Controller)
     FollowPath:
       # Plugin type for path following
@@ -194,32 +188,6 @@ controller_server:
       model_dt: 0.1
       # Number of sampled trajectories per iteration
       batch_size: 2000
-      # Maximum linear acceleration in x (m/s^2)
-      ax_max: 2.0
-      # Minimum linear acceleration in x (m/s^2)
-      ax_min: -2.0
-      # Maximum linear acceleration in y (m/s^2)
-      ay_max: 2.0
-      # Minimum linear acceleration in y (m/s^2)
-      ay_min: -2.0
-      # Maximum angular acceleration (rad/s^2)
-      az_max: 1.0
-      # Standard deviation for velocity noise in x (m/s)
-      vx_std: 0.2
-      # Standard deviation for velocity noise in y (m/s)
-      vy_std: 0.2
-      # Standard deviation for velocity noise in angular (rad/s)
-      wz_std: 0.4
-      # Maximum linear velocity in x (m/s)
-      vx_max: 1.0
-      # Minimum linear velocity in x (m/s)
-      vx_min: -1.0
-      # Maximum linear velocity in y (m/s)
-      vy_max: 1.0
-      # Minimum linear velocity in y (m/s)
-      vy_min: -1.0
-      # Maximum angular velocity (rad/s)
-      wz_max: 1.9
       # Number of optimization iterations per control cycle
       iteration_count: 1
       # Distance (meters) to prune the path behind the robot
@@ -491,7 +459,7 @@ global_costmap:
         # Scaling factor for inflation cost
         cost_scaling_factor: 3.0
         # Radius (meters) to inflate obstacles
-        inflation_radius: 0.7
+        inflation_radius: 0.1
       # Always send the full costmap on updates
       always_send_full_costmap: True
       # Enable or disable service introspection
@@ -535,7 +503,7 @@ planner_server:
       # Plugin type for grid-based planning
       plugin: "nav2_navfn_planner::NavfnPlanner"
       # Allowed tolerance (meters) for the goal
-      tolerance: 1.0
+      tolerance: 0.1
       # Use A* search algorithm (false = Dijkstra)
       use_astar: false
       # Allow planning through unknown space
@@ -698,31 +666,6 @@ route_server:
       # Plugin type for costmap scoring
       plugin: "nav2_route::CostmapScorer"
 
-# Velocity Smoother parameters
-velocity_smoother:
-  ros__parameters:
-    # Frequency (Hz) at which the velocity smoother runs
-    smoothing_frequency: 20.0
-    # Whether to scale velocities to the maximum allowed
-    scale_velocities: False
-    # Feedback mode for velocity smoothing (OPEN_LOOP or CLOSED_LOOP)
-    feedback: "OPEN_LOOP"
-    # Maximum allowed velocity [x, y, angular] (m/s, m/s, rad/s). Limits the speed of the robot in each direction.
-    max_velocity: [0.5, 0.5, 2.0]
-    # Minimum allowed velocity [x, y, angular] (m/s, m/s, rad/s). Limits the speed of the robot in each direction (negative for reverse/left).
-    min_velocity: [-0.5, -0.5, -2.0]
-    # Maximum allowed acceleration [x, y, angular] (m/s^2, m/s^2, rad/s^2). Limits how quickly the robot can speed up.
-    max_accel: [1.0, 1.0, 1.0]
-    # Maximum allowed deceleration [x, y, angular] (m/s^2, m/s^2, rad/s^2). Limits how quickly the robot can slow down (negative values).
-    max_decel: [-1.0, -1.0, -1.0]
-    # Topic for odometry messages
-    odom_topic: "odom"
-    # Duration (seconds) to use odometry data for smoothing
-    odom_duration: 0.1
-    # Deadband velocities [x, y, angular] below which commands are set to zero
-    deadband_velocity: [0.0, 0.0, 0.0]
-    # Timeout (seconds) for velocity commands before stopping the robot
-    velocity_timeout: 1.0
 
 # Collision Monitor parameters
 collision_monitor:
