@@ -123,6 +123,7 @@ class AutonomousMotorController(Node):
         # Convert RPM to percentage (-100 to 100)
         # Max forward speed is 0.5 m/s so max RPM is 123
         max_rpm = 123
+        min_effective_percent = 50
 
         for wheel_name, rpm in wheel_speeds.items():
             # Clamp RPM to max_rpm
@@ -130,6 +131,12 @@ class AutonomousMotorController(Node):
 
             # Convert to percentage
             percentage = int((rpm / max_rpm) * 100)
+
+            # Apply minimum effective percentage
+            if percentage > 0 and percentage < min_effective_percent:
+                percentage = min_effective_percent
+            elif percentage < 0 and percentage > -min_effective_percent:
+                percentage = -min_effective_percent
 
             # Control the wheel
             control_wheel(wheel_name, percentage)
