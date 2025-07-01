@@ -103,6 +103,15 @@ class AutonomousMotorController(Node):
             "back_right": back_right * rpm_factor,
         }
 
+        return wheel_speeds
+
+    def control_motors(self, wheel_speeds):
+        """
+        Control motors based on calculated wheel speeds.
+
+        Args:
+            wheel_speeds: dict containing speeds for each wheel
+        """
         # Convert RPM to percentage (-100 to 100)
         # Max forward speed is 0.5 m/s so max RPM is 123
         max_rpm = 123
@@ -128,8 +137,6 @@ class AutonomousMotorController(Node):
 
             # Control the wheel
             control_wheel(wheel_name, percentage)
-
-        return wheel_speeds
 
     def on_shutdown(self):
         """
