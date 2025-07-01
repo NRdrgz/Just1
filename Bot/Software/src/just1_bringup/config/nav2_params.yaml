@@ -145,6 +145,32 @@ controller_server:
     costmap_update_timeout: 3
     # Allowed time (seconds) for the robot to not make progress before considering the goal unreachable
     failure_tolerance: 3
+    # Maximum linear acceleration in x (m/s^2)
+    ax_max: 2.0
+    # Minimum linear acceleration in x (m/s^2)
+    ax_min: -2.0
+    # Maximum linear acceleration in y (m/s^2)
+    ay_max: 2.0
+    # Minimum linear acceleration in y (m/s^2)
+    ay_min: -2.0
+    # Maximum angular acceleration (rad/s^2)
+    az_max: 1.0
+    # Standard deviation for velocity noise in x (m/s)
+    vx_std: 0.2
+    # Standard deviation for velocity noise in y (m/s)
+    vy_std: 0.2
+    # Standard deviation for velocity noise in angular (rad/s)
+    wz_std: 0.4
+    # Maximum linear velocity in x (m/s)
+    vx_max: 1.0
+    # Minimum linear velocity in x (m/s)
+    vx_min: -1.0
+    # Maximum linear velocity in y (m/s)
+    vy_max: 1.0
+    # Minimum linear velocity in y (m/s)
+    vy_min: -1.0
+    # Maximum angular velocity (rad/s)
+    wz_max: 1.9
     # List of progress checker plugins to use
     progress_checker_plugins: ["progress_checker"]
     # List of goal checker plugins to use
