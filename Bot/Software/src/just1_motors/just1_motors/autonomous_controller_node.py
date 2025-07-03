@@ -110,31 +110,29 @@ class AutonomousMotorController(Node):
 
     def normalize_wheel_speeds(self, wheel_speeds):
         """
-        Normalize wheel speeds to be between 50 and 100 (or -50 and -100) when not zero.
+        Normalize wheel speeds to be between 70 and 100 (or -70 and -100) when not zero, relative to the maximum absolute speed in the current command.
         Args:
             wheel_speeds: dict containing speeds for each wheel (in RPM)
         Returns:
             dict: Normalized wheel speeds (in percent)
         """
-        max_rpm = 110
         min_effective_percent = 70
+        # Find the maximum absolute value among all wheel speeds
+        max_abs_rpm = (
+            max(abs(rpm) for rpm in wheel_speeds.values()) or 1.0
+        )  # avoid division by zero
         normalized = {}
         for wheel_name, rpm in wheel_speeds.items():
-            # Clamp RPM to max_rpm
-            rpm = max(-max_rpm, min(max_rpm, rpm))
-            # Convert to percentage
-            percentage = int((rpm / max_rpm) * 100)
-            # Normalize percentage to be between 50 and 100 (or -50 and -100) when not zero
-            if percentage > 0:
-                percentage = int(
-                    min_effective_percent + (percentage / 100) * min_effective_percent
-                )
-            elif percentage < 0:
-                percentage = int(
-                    -min_effective_percent + (percentage / 100) * min_effective_percent
-                )
-            # If percentage is 0, keep it as 0
-            normalized[wheel_name] = percentage
+            # Calculate the percentage relative to the max absolute RPM
+            percentage = (
+                (abs(rpm) / max_abs_rpm) * (100 - min_effective_percent)
+                + min_effective_percent
+                if rpm != 0
+                else 0
+            )
+            # Restore the sign
+            percentage = percentage if rpm >= 0 else -percentage
+            normalized[wheel_name] = int(percentage)
         return normalized
 
     def control_motors(self, wheel_speeds):
