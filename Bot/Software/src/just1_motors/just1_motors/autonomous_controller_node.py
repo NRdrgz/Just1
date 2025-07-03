@@ -116,8 +116,8 @@ class AutonomousMotorController(Node):
         Returns:
             dict: Normalized wheel speeds (in percent)
         """
-        max_rpm = 123
-        min_effective_percent = 50
+        max_rpm = 110
+        min_effective_percent = 70
         normalized = {}
         for wheel_name, rpm in wheel_speeds.items():
             # Clamp RPM to max_rpm
