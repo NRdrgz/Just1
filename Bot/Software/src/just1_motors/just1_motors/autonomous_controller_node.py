@@ -49,22 +49,25 @@ class AutonomousMotorController(Node):
         linear_y = msg.linear.y
         angular_z = msg.angular.z
 
-        # Calculate wheel speeds for mecanum drive
+        # Calculate wheel speeds for mecanum drive (in RPM)
         wheel_speeds = self.calculate_mecanum_wheel_speeds(
             linear_x, linear_y, angular_z
         )
 
-        # Publish wheel speeds
+        # Normalize wheel speeds to percent (50-100 or -50 to -100)
+        normalized_wheel_speeds = self.normalize_wheel_speeds(wheel_speeds)
+
+        # Publish normalized wheel speeds
         wheel_speeds_msg = WheelSpeeds()
-        wheel_speeds_msg.front_left = wheel_speeds["front_left"]
-        wheel_speeds_msg.front_right = wheel_speeds["front_right"]
-        wheel_speeds_msg.back_left = wheel_speeds["back_left"]
-        wheel_speeds_msg.back_right = wheel_speeds["back_right"]
+        wheel_speeds_msg.front_left = normalized_wheel_speeds["front_left"]
+        wheel_speeds_msg.front_right = normalized_wheel_speeds["front_right"]
+        wheel_speeds_msg.back_left = normalized_wheel_speeds["back_left"]
+        wheel_speeds_msg.back_right = normalized_wheel_speeds["back_right"]
 
         self.wheel_speeds_publisher.publish(wheel_speeds_msg)
 
-        # Control motors
-        self.control_motors(wheel_speeds)
+        # Control motors with normalized speeds
+        self.control_motors(normalized_wheel_speeds)
 
     def calculate_mecanum_wheel_speeds(self, linear_x, linear_y, angular_z):
         """
@@ -105,25 +108,22 @@ class AutonomousMotorController(Node):
 
         return wheel_speeds
 
-    def control_motors(self, wheel_speeds):
+    def normalize_wheel_speeds(self, wheel_speeds):
         """
-        Control motors based on calculated wheel speeds.
-
+        Normalize wheel speeds to be between 50 and 100 (or -50 and -100) when not zero.
         Args:
-            wheel_speeds: dict containing speeds for each wheel
+            wheel_speeds: dict containing speeds for each wheel (in RPM)
+        Returns:
+            dict: Normalized wheel speeds (in percent)
         """
-        # Convert RPM to percentage (-100 to 100)
-        # Max forward speed is 0.5 m/s so max RPM is 123
         max_rpm = 123
         min_effective_percent = 50
-
+        normalized = {}
         for wheel_name, rpm in wheel_speeds.items():
             # Clamp RPM to max_rpm
             rpm = max(-max_rpm, min(max_rpm, rpm))
-
             # Convert to percentage
             percentage = int((rpm / max_rpm) * 100)
-
             # Normalize percentage to be between 50 and 100 (or -50 and -100) when not zero
             if percentage > 0:
                 percentage = int(
@@ -134,8 +134,17 @@ class AutonomousMotorController(Node):
                     -min_effective_percent + (percentage / 100) * min_effective_percent
                 )
             # If percentage is 0, keep it as 0
+            normalized[wheel_name] = percentage
+        return normalized
 
-            # Control the wheel
+    def control_motors(self, wheel_speeds):
+        """
+        Control motors based on calculated wheel speeds.
+
+        Args:
+            wheel_speeds: dict containing speeds for each wheel (in percent)
+        """
+        for wheel_name, percentage in wheel_speeds.items():
             control_wheel(wheel_name, percentage)
 
     def on_shutdown(self):
