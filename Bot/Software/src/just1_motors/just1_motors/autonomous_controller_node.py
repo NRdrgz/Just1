@@ -59,10 +59,10 @@ class AutonomousMotorController(Node):
 
         # Publish normalized wheel speeds
         wheel_speeds_msg = WheelSpeeds()
-        wheel_speeds_msg.front_left = normalized_wheel_speeds["front_left"]
-        wheel_speeds_msg.front_right = normalized_wheel_speeds["front_right"]
-        wheel_speeds_msg.back_left = normalized_wheel_speeds["back_left"]
-        wheel_speeds_msg.back_right = normalized_wheel_speeds["back_right"]
+        wheel_speeds_msg.front_left = float(normalized_wheel_speeds["front_left"])
+        wheel_speeds_msg.front_right = float(normalized_wheel_speeds["front_right"])
+        wheel_speeds_msg.back_left = float(normalized_wheel_speeds["back_left"])
+        wheel_speeds_msg.back_right = float(normalized_wheel_speeds["back_right"])
 
         self.wheel_speeds_publisher.publish(wheel_speeds_msg)
 
@@ -145,7 +145,6 @@ class AutonomousMotorController(Node):
             wheel_speeds: dict containing speeds for each wheel (in percent)
         """
         for wheel_name, percentage in wheel_speeds.items():
-            print(f"Control {wheel_name} at {percentage}%")
             control_wheel(wheel_name, percentage)
 
     def on_shutdown(self):
