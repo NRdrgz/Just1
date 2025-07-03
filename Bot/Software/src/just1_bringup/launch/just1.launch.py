@@ -376,8 +376,7 @@ def generate_launch_description():
             {"scan_topic": "/scan"},  # 2D Lidar topic
             {"publish_tf": True},  # Publishes TF from odom -> base_link
             {"queue_size": 10},
-            {"Icp/MaxTranslation": 0.5},  # Maximum translation acceptance (m)
-            {"Icp/MaxRotation": 1.57},  # Maximum rotation acceptance (rad)
+            {"publish_null_when_lost": False},
         ],
         remappings=[
             ("/imu", "/imu/synced"),
