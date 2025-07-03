@@ -145,6 +145,7 @@ class AutonomousMotorController(Node):
             wheel_speeds: dict containing speeds for each wheel (in percent)
         """
         for wheel_name, percentage in wheel_speeds.items():
+            print(f"Control {wheel_name} at {percentage}%")
             control_wheel(wheel_name, percentage)
 
     def on_shutdown(self):
